@@ -59,6 +59,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   Animation<Matrix4> _animationReset;
   AnimationController _controllerReset;
 
+  AnimationController _rotationController;
+
   void _onAnimateReset() {
     _transformationController.value = _animationReset.value;
     if (!_controllerReset.isAnimating) {
@@ -94,18 +96,42 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
     }
   }
 
+  void _animateRotLeft() {
+    if (!_rotationController.isAnimating) {
+      if (_rotationController.value == 0){
+        _rotationController.value = 1;
+      }
+      _rotationController.animateTo(_rotationController.value - 0.25);
+    }
+  }
+
+  void _animateRotRight() {
+    if (!_rotationController.isAnimating) {
+      if (_rotationController.value == 1){
+        _rotationController.value = 0;
+      }
+      _rotationController.animateTo(_rotationController.value + 0.25);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _controllerReset = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 150),
+    );
+
+    _rotationController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
     );
   }
 
   @override
   void dispose() {
     _controllerReset.dispose();
+    _rotationController.dispose();
     super.dispose();
   }
 
@@ -121,15 +147,22 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
           onInteractionStart: _onInteractionStart,
           maxScale: 100.0,
           minScale: 0.5,
-          child: Center(
-            child: widget.filepath != null
-              ? Image.file(File(widget.filepath), scale: 1.0, filterQuality: FilterQuality.none,)
-              : Text('Não foi possível abrir a imagem'),
+          child: RotationTransition(
+            turns: _rotationController,
+            child: Center(
+              child: widget.filepath != null
+                ? Image.file(File(widget.filepath), scale: 1.0, filterQuality: FilterQuality.none,)
+                : Text('Não foi possível abrir a imagem'),
+            ),
           ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: AnimatedCtrl(onPressCenter: _animateResetInitialize),
+      floatingActionButton: AnimatedCtrl(
+        onPressCenter: _animateResetInitialize,
+        onPressRotLeft: _animateRotLeft,
+        onPressRotRight: _animateRotRight,
+      ),
     );
   }
 }
@@ -156,8 +189,16 @@ class CtrlButton extends FlatButton {
 }
 
 class AnimatedCtrl extends StatefulWidget {
-  AnimatedCtrl({Key key, this.onPressCenter}) : super(key: key);
+  AnimatedCtrl({
+    Key key,
+    this.onPressCenter,
+    this.onPressRotLeft,
+    this.onPressRotRight
+  }) : super(key: key);
+
   final void Function() onPressCenter;
+  final void Function() onPressRotLeft;
+  final void Function() onPressRotRight;
 
   @override
   _AnimatedCtrlState createState() => _AnimatedCtrlState();
@@ -221,13 +262,20 @@ class _AnimatedCtrlState extends State<AnimatedCtrl>
                 ),
                 onPress: () => {},
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 2),
-                child: CtrlButton(
-                  iconData: Icons.center_focus_weak_outlined,
-                  borderRadius: BorderRadius.zero,
-                  onPress: widget.onPressCenter,
-                ),
+              CtrlButton(
+                iconData: Icons.rotate_left,
+                borderRadius: BorderRadius.zero,
+                onPress: widget.onPressRotLeft,
+              ),
+              // CtrlButton(
+              //   iconData: Icons.center_focus_weak_outlined,
+              //   borderRadius: BorderRadius.zero,
+              //   onPress: widget.onPressCenter,
+              // ),
+              CtrlButton(
+                iconData: Icons.rotate_right,
+                borderRadius: BorderRadius.zero,
+                onPress: widget.onPressRotRight,
               ),
               CtrlButton(
                 iconData: Icons.arrow_forward,

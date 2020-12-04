@@ -4,14 +4,22 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter/rendering.dart';
-
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 
 void main(List<String> args) {
   String filepath;
-  if(args != null && args.isNotEmpty) {
+  if (args != null && args.isNotEmpty) {
     filepath = args[0];
   }
   runApp(MyApp(filepath));
+
+  doWhenWindowReady(() {
+    // var win = appWindow;
+    appWindow.minSize = Size(400, 300);
+    appWindow.alignment = Alignment.center;
+    // win.title = "Custom window with Flutter";
+    appWindow.show();
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -40,6 +48,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 /// This is the stateful widget that the main application instantiates.
 class MyStatefulWidget extends StatefulWidget {
   MyStatefulWidget({Key key, this.filepath}) : super(key: key);
@@ -98,7 +107,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
 
   void _animateRotLeft() {
     if (!_rotationController.isAnimating) {
-      if (_rotationController.value == 0){
+      if (_rotationController.value == 0) {
         _rotationController.value = 1;
       }
       _rotationController.animateTo(_rotationController.value - 0.25);
@@ -107,7 +116,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
 
   void _animateRotRight() {
     if (!_rotationController.isAnimating) {
-      if (_rotationController.value == 1){
+      if (_rotationController.value == 1) {
         _rotationController.value = 0;
       }
       _rotationController.animateTo(_rotationController.value + 0.25);
@@ -151,8 +160,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
             turns: _rotationController,
             child: Center(
               child: widget.filepath != null
-                ? Image.file(File(widget.filepath), scale: 1.0, filterQuality: FilterQuality.none,)
-                : Text('Não foi possível abrir a imagem'),
+                  ? Image.file(
+                      File(widget.filepath),
+                      scale: 1.0,
+                      filterQuality: FilterQuality.none,
+                    )
+                  : Text('Não foi possível abrir a imagem'),
             ),
           ),
         ),
@@ -177,7 +190,10 @@ class CtrlButton extends FlatButton {
   Widget build(BuildContext context) {
     return FlatButton(
       minWidth: 0,
-      child: Icon(iconData, color: Colors.grey[600],),
+      child: Icon(
+        iconData,
+        color: Colors.grey[600],
+      ),
       padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
       onPressed: onPress,
       color: Colors.grey[900],
@@ -189,12 +205,9 @@ class CtrlButton extends FlatButton {
 }
 
 class AnimatedCtrl extends StatefulWidget {
-  AnimatedCtrl({
-    Key key,
-    this.onPressCenter,
-    this.onPressRotLeft,
-    this.onPressRotRight
-  }) : super(key: key);
+  AnimatedCtrl(
+      {Key key, this.onPressCenter, this.onPressRotLeft, this.onPressRotRight})
+      : super(key: key);
 
   final void Function() onPressCenter;
   final void Function() onPressRotLeft;
@@ -207,7 +220,6 @@ class AnimatedCtrl extends StatefulWidget {
 /// This is the private State class that goes with AnimatedCtrl.
 class _AnimatedCtrlState extends State<AnimatedCtrl>
     with SingleTickerProviderStateMixin {
-
   AnimationController _controller;
   Animation<Offset> _offsetAnimation;
 
@@ -227,7 +239,6 @@ class _AnimatedCtrlState extends State<AnimatedCtrl>
       curve: Curves.easeInOutCubic,
     ));
   }
-  
 
   @override
   void dispose() {
@@ -237,8 +248,7 @@ class _AnimatedCtrlState extends State<AnimatedCtrl>
 
   @override
   Widget build(BuildContext context) {
-    return
-    MouseRegion(
+    return MouseRegion(
       onEnter: (PointerEvent pe) => {
         _controller.forward(),
       },
@@ -257,9 +267,8 @@ class _AnimatedCtrlState extends State<AnimatedCtrl>
               CtrlButton(
                 iconData: Icons.arrow_back,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  bottomLeft: Radius.circular(25)
-                ),
+                    topLeft: Radius.circular(25),
+                    bottomLeft: Radius.circular(25)),
                 onPress: () => {},
               ),
               CtrlButton(
@@ -280,9 +289,8 @@ class _AnimatedCtrlState extends State<AnimatedCtrl>
               CtrlButton(
                 iconData: Icons.arrow_forward,
                 borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(25),
-                  bottomRight: Radius.circular(25)
-                ),
+                    topRight: Radius.circular(25),
+                    bottomRight: Radius.circular(25)),
                 onPress: () => {},
               ),
             ],

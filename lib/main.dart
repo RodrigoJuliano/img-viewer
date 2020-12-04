@@ -6,6 +6,16 @@ import 'dart:io';
 import 'package:flutter/rendering.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 
+const suported_formats = [
+  '.png',
+  '.jpg',
+  '.gif',
+  '.webp',
+  '.bmp',
+  '.wbmp',
+  '.ico'
+];
+
 void main(List<String> args) {
   String filepath;
   if (args != null && args.isNotEmpty) {
@@ -20,6 +30,10 @@ void main(List<String> args) {
     // win.title = "Custom window with Flutter";
     appWindow.show();
   });
+}
+
+String getFileNameFrom(String path) {
+  return path.substring(path.lastIndexOf('\\') + 1);
 }
 
 class MyApp extends StatelessWidget {
@@ -69,6 +83,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   AnimationController _controllerReset;
 
   AnimationController _rotationController;
+  bool fileFound = false;
+  List<FileSystemEntity> imgsCurDir;
+  int curIndex;
 
   void _onAnimateReset() {
     _transformationController.value = _animationReset.value;
@@ -135,6 +152,66 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
       duration: const Duration(milliseconds: 500),
       vsync: this,
     );
+
+    if (widget.filepath != null) {
+      File file = File(widget.filepath);
+      fileFound = file.existsSync();
+      if (fileFound) {
+        imgsCurDir = file.parent.listSync().where((f) {
+          if (f is File) {
+            // Last 5 chars in lowercase
+            String _end = f.path
+                .substring(f.path.length - 5, f.path.length)
+                .toLowerCase();
+            // Check if it ends with one of the supported extensions
+            return suported_formats.any((e) => _end.endsWith(e));
+          } else {
+            return false;
+          }
+        }).toList(growable: false);
+
+        curIndex = imgsCurDir.indexWhere((el) => el.path == widget.filepath);
+        updateTitle();
+      }
+    }
+  }
+
+  void resetAllTransf() {
+    // Zoom
+    _animationReset?.removeListener(_onAnimateReset);
+    _animationReset = null;
+    _controllerReset.reset();
+    _transformationController.value = Matrix4.identity();
+
+    // Rotation
+    _rotationController.reset();
+  }
+
+  void updateTitle() {
+    appWindow.title =
+        "ImgViewer - " + getFileNameFrom(imgsCurDir[curIndex].path);
+  }
+
+  void goNextImg() {
+    resetAllTransf();
+    setState(() {
+      if (curIndex < imgsCurDir.length - 1)
+        curIndex++;
+      else
+        curIndex = 0;
+    });
+    updateTitle();
+  }
+
+  void goPrevImg() {
+    resetAllTransf();
+    setState(() {
+      if (curIndex > 0)
+        curIndex--;
+      else
+        curIndex = imgsCurDir.length - 1;
+    });
+    updateTitle();
   }
 
   @override
@@ -148,34 +225,34 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: GestureDetector(
-        onDoubleTap: _animateResetInitialize,
-        child: InteractiveViewer(
-          boundaryMargin: EdgeInsets.all(double.infinity),
-          transformationController: _transformationController,
-          onInteractionStart: _onInteractionStart,
-          maxScale: 100.0,
-          minScale: 0.5,
-          child: RotationTransition(
-            turns: _rotationController,
-            child: Center(
-              child: widget.filepath != null
-                  ? Image.file(
-                      File(widget.filepath),
-                      scale: 1.0,
-                      filterQuality: FilterQuality.none,
-                    )
-                  : Text('Não foi possível abrir a imagem'),
-            ),
-          ),
-        ),
-      ),
+      body: fileFound
+          ? GestureDetector(
+              onDoubleTap: _animateResetInitialize,
+              child: InteractiveViewer(
+                boundaryMargin: EdgeInsets.all(double.infinity),
+                transformationController: _transformationController,
+                onInteractionStart: _onInteractionStart,
+                maxScale: 100.0,
+                minScale: 0.5,
+                child: RotationTransition(
+                  turns: _rotationController,
+                  child: Center(
+                      child: Image.file(
+                    imgsCurDir[curIndex],
+                    scale: 1.0,
+                    filterQuality: FilterQuality.none,
+                  )),
+                ),
+              ),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: AnimatedCtrl(
-        onPressCenter: _animateResetInitialize,
-        onPressRotLeft: _animateRotLeft,
-        onPressRotRight: _animateRotRight,
-      ),
+          onPressCenter: _animateResetInitialize,
+          onPressRotLeft: _animateRotLeft,
+          onPressRotRight: _animateRotRight,
+          onPressPrev: goPrevImg,
+          onPressNext: goNextImg),
     );
   }
 }
@@ -206,12 +283,19 @@ class CtrlButton extends FlatButton {
 
 class AnimatedCtrl extends StatefulWidget {
   AnimatedCtrl(
-      {Key key, this.onPressCenter, this.onPressRotLeft, this.onPressRotRight})
+      {Key key,
+      this.onPressCenter,
+      this.onPressRotLeft,
+      this.onPressRotRight,
+      this.onPressPrev,
+      this.onPressNext})
       : super(key: key);
 
   final void Function() onPressCenter;
   final void Function() onPressRotLeft;
   final void Function() onPressRotRight;
+  final void Function() onPressPrev;
+  final void Function() onPressNext;
 
   @override
   _AnimatedCtrlState createState() => _AnimatedCtrlState();
@@ -269,7 +353,7 @@ class _AnimatedCtrlState extends State<AnimatedCtrl>
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(25),
                     bottomLeft: Radius.circular(25)),
-                onPress: () => {},
+                onPress: widget.onPressPrev,
               ),
               CtrlButton(
                 iconData: Icons.rotate_left,
@@ -291,7 +375,7 @@ class _AnimatedCtrlState extends State<AnimatedCtrl>
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(25),
                     bottomRight: Radius.circular(25)),
-                onPress: () => {},
+                onPress: widget.onPressNext,
               ),
             ],
           ),

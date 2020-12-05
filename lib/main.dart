@@ -228,14 +228,14 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>
       body: fileFound
           ? GestureDetector(
               onDoubleTap: _animateResetInitialize,
-              child: InteractiveViewer(
-                boundaryMargin: EdgeInsets.all(double.infinity),
-                transformationController: _transformationController,
-                onInteractionStart: _onInteractionStart,
-                maxScale: 100.0,
-                minScale: 0.5,
-                child: RotationTransition(
-                  turns: _rotationController,
+              child: RotationTransition(
+                turns: _rotationController,
+                child: InteractiveViewer(
+                  boundaryMargin: EdgeInsets.all(double.infinity),
+                  transformationController: _transformationController,
+                  onInteractionStart: _onInteractionStart,
+                  maxScale: 100.0,
+                  minScale: 0.5,
                   child: Center(
                       child: Image.file(
                     imgsCurDir[curIndex],

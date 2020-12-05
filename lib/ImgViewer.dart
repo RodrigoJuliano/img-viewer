@@ -37,6 +37,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   bool fileFound = false;
   List<FileSystemEntity> imgsCurDir;
   int curIndex;
+  File curFile;
 
   void _onAnimateReset() {
     _transformationController.value = _animationReset.value;
@@ -105,10 +106,10 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
     );
 
     if (widget.filepath != null) {
-      File file = File(widget.filepath);
-      fileFound = file.existsSync();
+      curFile = File(widget.filepath);
+      fileFound = curFile.existsSync();
       if (fileFound) {
-        imgsCurDir = file.parent.listSync().where((f) {
+        imgsCurDir = curFile.parent.listSync().where((f) {
           if (f is File) {
             // Last 5 chars in lowercase
             String _end = f.path
@@ -139,30 +140,34 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   }
 
   void updateTitle() {
-    appWindow.title =
-        "ImgViewer - " + getFileNameFrom(imgsCurDir[curIndex].path);
+    appWindow.title = "ImgViewer - " + getFileNameFrom(curFile.path);
   }
 
-  void goNextImg() {
-    resetAllTransf();
-    setState(() {
-      if (curIndex < imgsCurDir.length - 1)
-        curIndex++;
-      else
-        curIndex = 0;
-    });
-    updateTitle();
-  }
+  // 1 for the next img, -1 for previous one
+  void goToImg(int dir) {
+    if (imgsCurDir.isNotEmpty) {
+      resetAllTransf();
+      if (dir > 0) {
+        setState(() {
+          if (curIndex < imgsCurDir.length - 1)
+            curIndex++;
+          else
+            curIndex = 0;
 
-  void goPrevImg() {
-    resetAllTransf();
-    setState(() {
-      if (curIndex > 0)
-        curIndex--;
-      else
-        curIndex = imgsCurDir.length - 1;
-    });
-    updateTitle();
+          curFile = imgsCurDir[curIndex];
+        });
+      } else {
+        setState(() {
+          if (curIndex > 0)
+            curIndex--;
+          else
+            curIndex = imgsCurDir.length - 1;
+
+          curFile = imgsCurDir[curIndex];
+        });
+      }
+      updateTitle();
+    }
   }
 
   @override
@@ -188,11 +193,18 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
                   maxScale: 100.0,
                   minScale: 0.5,
                   child: Center(
-                      child: Image.file(
-                    imgsCurDir[curIndex],
-                    scale: 1.0,
-                    filterQuality: FilterQuality.none,
-                  )),
+                    child: Image.file(
+                      curFile,
+                      scale: 1.0,
+                      filterQuality: FilterQuality.none,
+                      errorBuilder: (BuildContext context, Object exception,
+                          StackTrace stackTrace) {
+                        print('Error loading image');
+                        print(exception.toString());
+                        return Text('The image could not be loaded. 😢');
+                      },
+                    ),
+                  ),
                 ),
               ),
             )
@@ -202,8 +214,8 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
           onPressCenter: _animateResetInitialize,
           onPressRotLeft: _animateRotLeft,
           onPressRotRight: _animateRotRight,
-          onPressPrev: goPrevImg,
-          onPressNext: goNextImg),
+          onPressPrev: () => goToImg(-1),
+          onPressNext: () => goToImg(1)),
     );
   }
 }

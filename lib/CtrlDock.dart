@@ -4,18 +4,16 @@ import 'CtrlButton.dart';
 class CtrlDock extends StatefulWidget {
   CtrlDock(
       {Key key,
-      this.onPressCenter,
       this.onPressRotLeft,
       this.onPressRotRight,
       this.onPressPrev,
       this.onPressNext})
       : super(key: key);
 
-  final void Function() onPressCenter;
-  final void Function() onPressRotLeft;
-  final void Function() onPressRotRight;
-  final void Function() onPressPrev;
-  final void Function() onPressNext;
+  final VoidCallback onPressRotLeft;
+  final VoidCallback onPressRotRight;
+  final VoidCallback onPressPrev;
+  final VoidCallback onPressNext;
 
   @override
   _CtrlDockState createState() => _CtrlDockState();
@@ -80,11 +78,6 @@ class _CtrlDockState extends State<CtrlDock>
                 borderRadius: BorderRadius.zero,
                 onPress: widget.onPressRotLeft,
               ),
-              // CtrlButton(
-              //   iconData: Icons.center_focus_weak_outlined,
-              //   borderRadius: BorderRadius.zero,
-              //   onPress: widget.onPressCenter,
-              // ),
               CtrlButton(
                 iconData: Icons.rotate_right,
                 borderRadius: BorderRadius.zero,

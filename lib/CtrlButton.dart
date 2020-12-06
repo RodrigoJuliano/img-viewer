@@ -4,7 +4,7 @@ class CtrlButton extends FlatButton {
   CtrlButton({this.iconData, this.borderRadius, this.onPress});
   final IconData iconData;
   final BorderRadius borderRadius;
-  final void Function() onPress;
+  final VoidCallback onPress;
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +17,8 @@ class CtrlButton extends FlatButton {
       padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
       onPressed: onPress,
       color: Colors.grey[900],
+      highlightColor: Colors.grey[850],
+      hoverColor: Color.fromARGB(255, 30, 30, 30),
       shape: RoundedRectangleBorder(
         borderRadius: borderRadius,
       ),

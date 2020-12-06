@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter/services.dart';
 import 'CtrlDock.dart';
 import 'Utils.dart';
 
@@ -23,6 +24,12 @@ class ImgViewer extends StatefulWidget {
 
   @override
   _ImgViewerState createState() => _ImgViewerState();
+}
+
+class CallbakIntent extends Intent {
+  const CallbakIntent({this.callback});
+
+  final VoidCallback callback;
 }
 
 /// This is the private State class that goes with MyStatefulWidget.
@@ -179,43 +186,67 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: fileFound
-          ? GestureDetector(
-              onDoubleTap: _animateResetInitialize,
-              child: RotationTransition(
-                turns: _rotationController,
-                child: InteractiveViewer(
-                  boundaryMargin: EdgeInsets.all(double.infinity),
-                  transformationController: _transformationController,
-                  onInteractionStart: _onInteractionStart,
-                  maxScale: 100.0,
-                  minScale: 0.5,
-                  child: Center(
-                    child: Image.file(
-                      curFile,
-                      scale: 1.0,
-                      filterQuality: FilterQuality.none,
-                      errorBuilder: (BuildContext context, Object exception,
-                          StackTrace stackTrace) {
-                        print('Error loading image');
-                        print(exception.toString());
-                        return Text('The image could not be loaded. 😢');
-                      },
+    return Shortcuts(
+      shortcuts: <LogicalKeySet, Intent>{
+        LogicalKeySet(LogicalKeyboardKey.arrowLeft):
+            CallbakIntent(callback: () => goToImg(-1)),
+        LogicalKeySet(LogicalKeyboardKey.arrowRight):
+            CallbakIntent(callback: () => goToImg(1)),
+        LogicalKeySet(LogicalKeyboardKey.arrowUp):
+            CallbakIntent(callback: _animateRotLeft),
+        LogicalKeySet(LogicalKeyboardKey.arrowDown):
+            CallbakIntent(callback: _animateRotRight),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          CallbakIntent: CallbackAction<CallbakIntent>(
+            onInvoke: (CallbakIntent intent) {
+              return intent.callback();
+            },
+          ),
+        },
+        child: Focus(
+          autofocus: true,
+          child: Scaffold(
+            backgroundColor: Colors.black,
+            body: fileFound
+                ? GestureDetector(
+                    onDoubleTap: _animateResetInitialize,
+                    child: RotationTransition(
+                      turns: _rotationController,
+                      child: InteractiveViewer(
+                        boundaryMargin: EdgeInsets.all(double.infinity),
+                        transformationController: _transformationController,
+                        onInteractionStart: _onInteractionStart,
+                        maxScale: 100.0,
+                        minScale: 0.5,
+                        child: Center(
+                          child: Image.file(
+                            curFile,
+                            scale: 1.0,
+                            filterQuality: FilterQuality.none,
+                            errorBuilder: (BuildContext context,
+                                Object exception, StackTrace stackTrace) {
+                              print('Error loading image');
+                              print(exception.toString());
+                              return Text('The image could not be loaded. 😢');
+                            },
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: CtrlDock(
-          onPressCenter: _animateResetInitialize,
-          onPressRotLeft: _animateRotLeft,
-          onPressRotRight: _animateRotRight,
-          onPressPrev: () => goToImg(-1),
-          onPressNext: () => goToImg(1)),
+                  )
+                : null,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerDocked,
+            floatingActionButton: CtrlDock(
+                onPressRotLeft: _animateRotLeft,
+                onPressRotRight: _animateRotRight,
+                onPressPrev: () => goToImg(-1),
+                onPressNext: () => goToImg(1)),
+          ),
+        ),
+      ),
     );
   }
 }

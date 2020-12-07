@@ -11,10 +11,10 @@ void main(List<String> args) {
   runApp(MyApp(filepath));
 
   doWhenWindowReady(() {
-    // var win = appWindow;
     appWindow.minSize = Size(400, 300);
+    appWindow.size = Size(800, 600);
     appWindow.alignment = Alignment.center;
-    // win.title = "Custom window with Flutter";
+    // appWindow.title = "Custom window with Flutter";
     appWindow.show();
   });
 }
@@ -39,7 +39,9 @@ class MyApp extends StatelessWidget {
           // or simply save your changes to "hot reload" in a Flutter IDE).
           // Notice that the counter didn't reset back to zero; the application
           // is not restarted.
-          primarySwatch: Colors.blue,
+          // primarySwatch: Colors.blue,
+          backgroundColor: Colors.black,
+          scaffoldBackgroundColor: Colors.black,
           textTheme: TextTheme(
               bodyText2: TextStyle(color: Colors.grey[400], fontSize: 16))),
       home: ImgViewer(filepath: filepath),

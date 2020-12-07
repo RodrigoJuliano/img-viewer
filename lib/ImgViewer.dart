@@ -207,10 +207,9 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
         },
         child: Focus(
           autofocus: true,
-          child: Scaffold(
-            backgroundColor: Colors.black,
-            body: fileFound
-                ? GestureDetector(
+          child: fileFound
+              ? Scaffold(
+                  body: GestureDetector(
                     onDoubleTap: _animateResetInitialize,
                     child: RotationTransition(
                       turns: _rotationController,
@@ -235,16 +234,16 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
                         ),
                       ),
                     ),
-                  )
-                : null,
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerDocked,
-            floatingActionButton: CtrlDock(
-                onPressRotLeft: _animateRotLeft,
-                onPressRotRight: _animateRotRight,
-                onPressPrev: () => goToImg(-1),
-                onPressNext: () => goToImg(1)),
-          ),
+                  ),
+                  floatingActionButtonLocation:
+                      FloatingActionButtonLocation.centerDocked,
+                  floatingActionButton: CtrlDock(
+                      onPressRotLeft: _animateRotLeft,
+                      onPressRotRight: _animateRotRight,
+                      onPressPrev: () => goToImg(-1),
+                      onPressNext: () => goToImg(1)),
+                )
+              : Scaffold(),
         ),
       ),
     );

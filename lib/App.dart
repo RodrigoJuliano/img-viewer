@@ -35,7 +35,8 @@ class _AppState extends State<App> {
       theme: ThemeData(
           scaffoldBackgroundColor: Colors.black,
           textTheme: TextTheme(
-              bodyText2: TextStyle(color: Colors.grey[400], fontSize: 16))),
+              bodyText2: TextStyle(color: Colors.grey[400], fontSize: 16),
+              subtitle1: TextStyle(color: Colors.grey[400], fontSize: 16))),
       home: ImgViewer(filepath: widget.filepath),
     );
   }

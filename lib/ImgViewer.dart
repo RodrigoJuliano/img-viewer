@@ -17,6 +17,32 @@ const suported_formats = [
   '.ico'
 ];
 
+enum ContextItem { openFile, fileInfo, help, aboult }
+
+const List<PopupMenuEntry> contextItens = [
+  const PopupMenuItem<ContextItem>(
+    value: ContextItem.openFile,
+    child: Text('Open file'),
+    height: 30,
+  ),
+  const PopupMenuItem<ContextItem>(
+    value: ContextItem.fileInfo,
+    child: Text('File info'),
+    height: 30,
+  ),
+  const PopupMenuDivider(),
+  const PopupMenuItem<ContextItem>(
+    value: ContextItem.help,
+    child: Text('Help'),
+    height: 30,
+  ),
+  const PopupMenuItem<ContextItem>(
+    value: ContextItem.aboult,
+    child: Text('About'),
+    height: 30,
+  ),
+];
+
 /// This is the stateful widget that the main application instantiates.
 class ImgViewer extends StatefulWidget {
   ImgViewer({Key key, this.filepath}) : super(key: key);
@@ -40,6 +66,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   List<FileSystemEntity> imgsCurDir;
   int curIndex;
   File curFile;
+  ContextItem _selection;
 
   void _onAnimateReset() {
     _transformationController.value = _animationReset.value;
@@ -127,6 +154,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
         curIndex = imgsCurDir.indexWhere((el) => el.path == widget.filepath);
         updateTitle();
       }
+      // ctxMenuVisible = false;
     }
 
     // To execute after fist frame (The App parent is builded after this widget)
@@ -187,6 +215,15 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
     }
   }
 
+  void onRightClick(Offset pos) {
+    showMenu(
+            color: Colors.grey[800],
+            context: context,
+            position: RelativeRect.fromLTRB(pos.dx, pos.dy, pos.dx, pos.dy),
+            items: contextItens)
+        .then((value) => print(value));
+  }
+
   @override
   void dispose() {
     _controllerReset.dispose();
@@ -196,20 +233,22 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return fileFound
-        ? Scaffold(
-            body: GestureDetector(
-              onDoubleTap: _animateResetInitialize,
-              child: RotationTransition(
-                turns: _rotationController,
-                child: InteractiveViewer(
-                  boundaryMargin: EdgeInsets.all(double.infinity),
-                  transformationController: _transformationController,
-                  onInteractionStart: _onInteractionStart,
-                  maxScale: 100.0,
-                  minScale: 0.5,
-                  child: Center(
-                    child: Image.file(
+    return Scaffold(
+      body: GestureDetector(
+        onDoubleTap: _animateResetInitialize,
+        onSecondaryTapUp: (TapUpDetails details) =>
+            onRightClick(details.localPosition),
+        child: RotationTransition(
+          turns: _rotationController,
+          child: InteractiveViewer(
+            boundaryMargin: EdgeInsets.all(double.infinity),
+            transformationController: _transformationController,
+            onInteractionStart: _onInteractionStart,
+            maxScale: 100.0,
+            minScale: 0.5,
+            child: Center(
+              child: curFile != null
+                  ? Image.file(
                       curFile,
                       scale: 1.0,
                       filterQuality: FilterQuality.none,
@@ -219,19 +258,20 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
                         print(exception.toString());
                         return Text('The image could not be loaded. 😢');
                       },
-                    ),
-                  ),
-                ),
-              ),
+                    )
+                  : null,
             ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerDocked,
-            floatingActionButton: CtrlDock(
-                onPressRotLeft: _animateRotLeft,
-                onPressRotRight: _animateRotRight,
-                onPressPrev: () => goToImg(-1),
-                onPressNext: () => goToImg(1)),
-          )
-        : Scaffold();
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: curFile != null
+          ? CtrlDock(
+              onPressRotLeft: _animateRotLeft,
+              onPressRotRight: _animateRotRight,
+              onPressPrev: () => goToImg(-1),
+              onPressNext: () => goToImg(1))
+          : null,
+    );
   }
 }

@@ -33,10 +33,19 @@ class _AppState extends State<App> {
       shortcuts: _shortcuts,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          scaffoldBackgroundColor: Colors.black,
-          textTheme: TextTheme(
-              bodyText2: TextStyle(color: Colors.grey[400], fontSize: 16),
-              subtitle1: TextStyle(color: Colors.grey[400], fontSize: 16))),
+        scaffoldBackgroundColor: Colors.black,
+        dialogTheme: DialogTheme(
+          backgroundColor: Colors.grey[900],
+          titleTextStyle: TextStyle(color: Colors.grey[400]),
+          // contentTextStyle:
+        ),
+        dividerColor: Colors.black45,
+        dividerTheme: DividerThemeData(endIndent: 5, indent: 5),
+        textTheme: TextTheme(
+            bodyText2: TextStyle(color: Colors.grey[400], fontSize: 16),
+            subtitle1: TextStyle(color: Colors.grey[400], fontSize: 16),
+            headline6: TextStyle(color: Colors.grey[400])),
+      ),
       home: ImgViewer(filepath: widget.filepath),
     );
   }

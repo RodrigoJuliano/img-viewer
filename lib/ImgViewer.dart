@@ -6,20 +6,13 @@ import 'package:flutter/services.dart';
 import 'CtrlDock.dart';
 import 'Utils.dart';
 import 'App.dart';
+import 'package:file_chooser/file_chooser.dart';
 
-const suported_formats = [
-  '.png',
-  '.jpg',
-  '.gif',
-  '.webp',
-  '.bmp',
-  '.wbmp',
-  '.ico'
-];
+const suported_formats = ['png', 'jpg', 'gif', 'webp', 'bmp', 'wbmp', 'ico'];
 
 enum ContextItem { openFile, fileInfo, help, aboult }
 
-const List<PopupMenuEntry> contextItens = [
+const List<PopupMenuEntry<ContextItem>> contextItens = [
   const PopupMenuItem<ContextItem>(
     value: ContextItem.openFile,
     child: Text('Open file'),
@@ -66,7 +59,6 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   List<FileSystemEntity> imgsCurDir;
   int curIndex;
   File curFile;
-  ContextItem _selection;
 
   void _onAnimateReset() {
     _transformationController.value = _animationReset.value;
@@ -134,28 +126,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
       vsync: this,
     );
 
-    if (widget.filepath != null) {
-      curFile = File(widget.filepath);
-      fileFound = curFile.existsSync();
-      if (fileFound) {
-        imgsCurDir = curFile.parent.listSync().where((f) {
-          if (f is File) {
-            // Last 5 chars in lowercase
-            String _end = f.path
-                .substring(f.path.length - 5, f.path.length)
-                .toLowerCase();
-            // Check if it ends with one of the supported extensions
-            return suported_formats.any((e) => _end.endsWith(e));
-          } else {
-            return false;
-          }
-        }).toList(growable: false);
-
-        curIndex = imgsCurDir.indexWhere((el) => el.path == widget.filepath);
-        updateTitle();
-      }
-      // ctxMenuVisible = false;
-    }
+    iniFile(widget.filepath);
 
     // To execute after fist frame (The App parent is builded after this widget)
     WidgetsBinding.instance.addPostFrameCallback((_) => {
@@ -171,6 +142,32 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
                 CallbakIntent(callback: _animateRotRight),
           }
         });
+  }
+
+  void iniFile(String filePath) {
+    if (filePath != null) {
+      setState(() {
+        curFile = File(filePath);
+        fileFound = curFile.existsSync();
+        if (fileFound) {
+          imgsCurDir = curFile.parent.listSync().where((f) {
+            if (f is File) {
+              // Last 5 chars in lowercase
+              String _end = f.path
+                  .substring(f.path.length - 5, f.path.length)
+                  .toLowerCase();
+              // Check if it ends with one of the supported extensions
+              return suported_formats.any((e) => _end.endsWith('.' + e));
+            } else {
+              return false;
+            }
+          }).toList(growable: false);
+
+          curIndex = imgsCurDir.indexWhere((el) => el.path == filePath);
+          updateTitle();
+        }
+      });
+    }
   }
 
   void resetAllTransf() {
@@ -215,13 +212,23 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
     }
   }
 
-  void onRightClick(Offset pos) {
-    showMenu(
-            color: Colors.grey[800],
-            context: context,
-            position: RelativeRect.fromLTRB(pos.dx, pos.dy, pos.dx, pos.dy),
-            items: contextItens)
-        .then((value) => print(value));
+  void onRightClick(Offset pos) async {
+    ContextItem selection = await showMenu(
+        color: Colors.grey[800],
+        context: context,
+        position: RelativeRect.fromLTRB(pos.dx, pos.dy, pos.dx, pos.dy),
+        items: contextItens);
+
+    if (selection == ContextItem.openFile) {
+      FileChooserResult result = await showOpenPanel(allowedFileTypes: [
+        FileTypeFilterGroup(label: 'Image', fileExtensions: suported_formats),
+        FileTypeFilterGroup(label: 'All files'),
+      ]);
+      if (!result.canceled && result.paths.isNotEmpty) {
+        iniFile(result.paths[0]);
+        resetAllTransf();
+      }
+    }
   }
 
   @override

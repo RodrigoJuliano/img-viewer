@@ -7,35 +7,9 @@ import 'package:flutter/services.dart';
 import 'CtrlDock.dart';
 import 'Utils.dart';
 import 'App.dart';
-import 'package:file_chooser/file_chooser.dart';
+import 'ContextMenu.dart';
 
 const suported_formats = ['png', 'jpg', 'gif', 'webp', 'bmp', 'wbmp', 'ico'];
-
-enum ContextItem { openFile, fileInfo, help, aboult }
-
-const List<PopupMenuEntry<ContextItem>> contextItens = [
-  const PopupMenuItem<ContextItem>(
-    value: ContextItem.openFile,
-    child: Text('Open file'),
-    height: 30,
-  ),
-  const PopupMenuItem<ContextItem>(
-    value: ContextItem.fileInfo,
-    child: Text('File info'),
-    height: 30,
-  ),
-  const PopupMenuDivider(),
-  const PopupMenuItem<ContextItem>(
-    value: ContextItem.help,
-    child: Text('Help'),
-    height: 30,
-  ),
-  const PopupMenuItem<ContextItem>(
-    value: ContextItem.aboult,
-    child: Text('About'),
-    height: 30,
-  ),
-];
 
 /// This is the stateful widget that the main application instantiates.
 class ImgViewer extends StatefulWidget {
@@ -188,7 +162,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
 
   // 1 for the next img, -1 for previous one
   void goToImg(int dir) {
-    if (imgsCurDir.isNotEmpty) {
+    if (imgsCurDir != null && imgsCurDir.isNotEmpty) {
       resetAllTransf();
       if (dir > 0) {
         setState(() {
@@ -213,93 +187,6 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
     }
   }
 
-  void onRightClick(Offset pos) async {
-    ContextItem selection = await showMenu(
-        color: Colors.grey[900],
-        context: context,
-        position: RelativeRect.fromLTRB(pos.dx, pos.dy, pos.dx, pos.dy),
-        items: contextItens);
-
-    switch (selection) {
-      case ContextItem.openFile:
-        FileChooserResult result = await showOpenPanel(allowedFileTypes: [
-          FileTypeFilterGroup(label: 'Image', fileExtensions: suported_formats),
-          FileTypeFilterGroup(label: 'All files'),
-        ]);
-        if (!result.canceled && result.paths.isNotEmpty) {
-          iniFile(result.paths[0]);
-          resetAllTransf();
-        }
-        break;
-      case ContextItem.fileInfo:
-        showDialog(
-          context: context,
-          builder: (BuildContext context) => SimpleDialog(
-            title: Column(
-              children: [
-                Text(
-                  'File Info',
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
-                Divider(),
-              ],
-            ),
-            contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 12.0),
-            children: [
-              Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      'Name:',
-                      'Directory:',
-                      'Type:',
-                      'Size:',
-                      'Modified:',
-                    ]
-                        .map((e) => Padding(
-                              padding: EdgeInsets.symmetric(vertical: 5),
-                              child: Text(e),
-                            ))
-                        .toList(),
-                  ),
-                  Divider(indent: 10),
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        getFileNameFrom(curFile.path),
-                        curFile.absolute.path.substring(
-                            0, curFile.absolute.path.lastIndexOf('\\')),
-                        curFile.path
-                            .substring(curFile.path.lastIndexOf('.') + 1),
-                        fileSizeHumanReadable(curFile.lengthSync()),
-                        curFile.lastModifiedSync().toString(),
-                      ]
-                          .map((e) => SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                padding: EdgeInsets.symmetric(vertical: 5),
-                                child: Text(e),
-                              ))
-                          .toList(),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-        break;
-      case ContextItem.help:
-        break;
-      case ContextItem.aboult:
-        break;
-      default:
-    }
-  }
-
   @override
   void dispose() {
     _controllerReset.dispose();
@@ -312,8 +199,14 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
     return Scaffold(
       body: GestureDetector(
         onDoubleTap: _animateResetInitialize,
-        onSecondaryTapUp: (TapUpDetails details) =>
-            onRightClick(details.localPosition),
+        onSecondaryTapUp: (TapUpDetails details) => showContextMenu(
+            context: context,
+            pos: details.localPosition,
+            curFile: curFile,
+            onSelectFile: (file) {
+              iniFile(file);
+              resetAllTransf();
+            }),
         child: RotationTransition(
           turns: _rotationController,
           child: InteractiveViewer(

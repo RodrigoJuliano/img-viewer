@@ -8,6 +8,7 @@ import 'CtrlDock.dart';
 import 'Utils.dart';
 import 'App.dart';
 import 'ContextMenu.dart';
+import 'ResetableIntViewer.dart';
 
 const suported_formats = ['png', 'jpg', 'gif', 'webp', 'bmp', 'wbmp', 'ico'];
 
@@ -26,49 +27,12 @@ class ImgViewer extends StatefulWidget {
 class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   final TransformationController _transformationController =
       TransformationController();
-  Animation<Matrix4> _animationReset;
-  AnimationController _controllerReset;
 
   AnimationController _rotationController;
   bool fileFound = false;
   List<FileSystemEntity> imgsCurDir;
   int curIndex;
   File curFile;
-
-  void _onAnimateReset() {
-    _transformationController.value = _animationReset.value;
-    if (!_controllerReset.isAnimating) {
-      _animationReset?.removeListener(_onAnimateReset);
-      _animationReset = null;
-      _controllerReset.reset();
-    }
-  }
-
-  void _animateResetInitialize() {
-    _controllerReset.reset();
-    _animationReset = Matrix4Tween(
-      begin: _transformationController.value,
-      end: Matrix4.identity(),
-    ).animate(_controllerReset);
-    _animationReset.addListener(_onAnimateReset);
-    _controllerReset.forward();
-  }
-
-// Stop a running reset to home transform animation.
-  void _animateResetStop() {
-    _controllerReset.stop();
-    _animationReset?.removeListener(_onAnimateReset);
-    _animationReset = null;
-    _controllerReset.reset();
-  }
-
-  void _onInteractionStart(ScaleStartDetails details) {
-    // If the user tries to cause a transformation while the reset animation is
-    // running, cancel the reset animation.
-    if (_controllerReset.status == AnimationStatus.forward) {
-      _animateResetStop();
-    }
-  }
 
   void _animateRotLeft() {
     if (!_rotationController.isAnimating) {
@@ -88,13 +52,16 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
     }
   }
 
+  void _animateResetRot() {
+    if (_rotationController.value < 0.5)
+      _rotationController.animateTo(0.0, duration: Duration(milliseconds: 200));
+    else
+      _rotationController.animateTo(1.0);
+  }
+
   @override
   void initState() {
     super.initState();
-    _controllerReset = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 150),
-    );
 
     _rotationController = AnimationController(
       duration: const Duration(milliseconds: 500),
@@ -147,9 +114,6 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
 
   void resetAllTransf() {
     // Zoom
-    _animationReset?.removeListener(_onAnimateReset);
-    _animationReset = null;
-    _controllerReset.reset();
     _transformationController.value = Matrix4.identity();
 
     // Rotation
@@ -189,7 +153,6 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _controllerReset.dispose();
     _rotationController.dispose();
     super.dispose();
   }
@@ -197,40 +160,34 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        onDoubleTap: _animateResetInitialize,
-        onSecondaryTapUp: (TapUpDetails details) => showContextMenu(
-            context: context,
-            pos: details.localPosition,
-            curFile: curFile,
-            onSelectFile: (file) {
-              iniFile(file);
-              resetAllTransf();
-            }),
+      body: ResetableIntViewer(
+        transformationController: _transformationController,
+        onRightClick: (Offset pos) {
+          showContextMenu(
+              context: context,
+              pos: pos,
+              curFile: curFile,
+              onSelectFile: (file) {
+                iniFile(file);
+                resetAllTransf();
+              });
+        },
+        onDoubleClick: _animateResetRot,
         child: RotationTransition(
           turns: _rotationController,
-          child: InteractiveViewer(
-            boundaryMargin: EdgeInsets.all(double.infinity),
-            transformationController: _transformationController,
-            onInteractionStart: _onInteractionStart,
-            maxScale: 100.0,
-            minScale: 0.5,
-            child: Center(
-              child: curFile != null
-                  ? Image.file(
-                      curFile,
-                      scale: 1.0,
-                      filterQuality: FilterQuality.none,
-                      errorBuilder: (BuildContext context, Object exception,
-                          StackTrace stackTrace) {
-                        print('Error loading image');
-                        print(exception.toString());
-                        return Text('The image could not be loaded. 😢');
-                      },
-                    )
-                  : null,
-            ),
-          ),
+          child: curFile != null
+              ? Image.file(
+                  curFile,
+                  scale: 1.0,
+                  filterQuality: FilterQuality.none,
+                  errorBuilder: (BuildContext context, Object exception,
+                      StackTrace stackTrace) {
+                    print('Error loading image');
+                    print(exception.toString());
+                    return Text('The image could not be loaded. 😢');
+                  },
+                )
+              : null,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

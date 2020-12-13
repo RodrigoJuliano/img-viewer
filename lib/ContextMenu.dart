@@ -6,7 +6,7 @@ import 'Utils.dart';
 
 enum ContextItem { openFile, fileInfo, help, aboult }
 
-const List<PopupMenuEntry<ContextItem>> contextItens = [
+List<PopupMenuEntry<ContextItem>> contextItens = [
   const PopupMenuItem<ContextItem>(
     value: ContextItem.openFile,
     child: Text('Open file'),
@@ -35,8 +35,15 @@ void showContextMenu(
     Offset pos,
     File curFile,
     onSelectFile(String file)}) async {
+  // Recreate the file info item. It can be enabled or disabled
+  contextItens[1] = PopupMenuItem<ContextItem>(
+    value: ContextItem.fileInfo,
+    child: Text('File info'),
+    height: 30,
+    enabled: curFile != null,
+  );
+
   ContextItem selection = await showMenu(
-      color: Colors.grey[900],
       context: context,
       position: RelativeRect.fromLTRB(pos.dx, pos.dy, pos.dx, pos.dy),
       items: contextItens);

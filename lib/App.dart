@@ -41,6 +41,8 @@ class _AppState extends State<App> {
         ),
         dividerColor: Colors.black45,
         dividerTheme: DividerThemeData(endIndent: 5, indent: 5),
+        popupMenuTheme: PopupMenuThemeData(color: Colors.grey[900]),
+        disabledColor: Colors.grey[600],
         textTheme: TextTheme(
             bodyText2: TextStyle(color: Colors.grey[400], fontSize: 16),
             subtitle1: TextStyle(color: Colors.grey[400], fontSize: 16),

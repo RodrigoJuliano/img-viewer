@@ -12,10 +12,9 @@ List<PopupMenuEntry<ContextItem>> contextItens = [
     child: Text('Open file'),
     height: 30,
   ),
+  // Placeholder for file info
   const PopupMenuItem<ContextItem>(
-    value: ContextItem.fileInfo,
-    child: Text('File info'),
-    height: 30,
+    child: null,
   ),
   const PopupMenuDivider(),
   const PopupMenuItem<ContextItem>(
@@ -30,11 +29,11 @@ List<PopupMenuEntry<ContextItem>> contextItens = [
   ),
 ];
 
-void showContextMenu(
+Future showContextMenu(
     {BuildContext context,
     Offset pos,
     File curFile,
-    onSelectFile(String file)}) async {
+    void onSelectFile(String file)}) async {
   // Recreate the file info item. It can be enabled or disabled
   contextItens[1] = PopupMenuItem<ContextItem>(
     value: ContextItem.fileInfo,
@@ -43,85 +42,96 @@ void showContextMenu(
     enabled: curFile != null,
   );
 
-  ContextItem selection = await showMenu(
-      context: context,
-      position: RelativeRect.fromLTRB(pos.dx, pos.dy, pos.dx, pos.dy),
-      items: contextItens);
+  return showMenu(
+          context: context,
+          position: RelativeRect.fromLTRB(pos.dx, pos.dy, pos.dx, pos.dy),
+          items: contextItens)
+      .then((selection) {
+    switch (selection) {
+      case ContextItem.openFile:
+        return showOpenFileDialog().then((file) => onSelectFile(file));
+        break;
+      case ContextItem.fileInfo:
+        return showFileInfoDialog(context, curFile);
+        break;
+      case ContextItem.help:
+        break;
+      case ContextItem.aboult:
+        break;
+      default:
+    }
+  });
+}
 
-  switch (selection) {
-    case ContextItem.openFile:
-      FileChooserResult result = await showOpenPanel(allowedFileTypes: [
-        FileTypeFilterGroup(label: 'Image', fileExtensions: suported_formats),
-        FileTypeFilterGroup(label: 'All files'),
-      ]);
-      if (!result.canceled && result.paths.isNotEmpty) {
-        onSelectFile(result.paths[0]);
-      }
-      break;
-    case ContextItem.fileInfo:
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => SimpleDialog(
-          title: Column(
-            children: [
-              Text(
-                'File Info',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              Divider(),
-            ],
+Future<String> showOpenFileDialog() {
+  return showOpenPanel(allowedFileTypes: [
+    FileTypeFilterGroup(label: 'Image', fileExtensions: suported_formats),
+    FileTypeFilterGroup(label: 'All files'),
+  ]).then((result) {
+    if (!result.canceled && result.paths.isNotEmpty)
+      return result.paths[0];
+    else
+      return null;
+  });
+}
+
+Future showFileInfoDialog(BuildContext context, File curFile) {
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) => SimpleDialog(
+      title: Column(
+        children: [
+          Text(
+            'File Info',
+            style: TextStyle(
+              fontSize: 18,
+            ),
           ),
-          contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 12.0),
+          Divider(),
+        ],
+      ),
+      contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 12.0),
+      children: [
+        Row(
           children: [
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    'Name:',
-                    'Directory:',
-                    'Type:',
-                    'Size:',
-                    'Modified:',
-                  ]
-                      .map((e) => Padding(
-                            padding: EdgeInsets.symmetric(vertical: 5),
-                            child: Text(e),
-                          ))
-                      .toList(),
-                ),
-                Divider(indent: 10),
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      getFileNameFrom(curFile.path),
-                      curFile.absolute.path.substring(
-                          0, curFile.absolute.path.lastIndexOf('\\')),
-                      curFile.path.substring(curFile.path.lastIndexOf('.') + 1),
-                      fileSizeHumanReadable(curFile.lengthSync()),
-                      curFile.lastModifiedSync().toString(),
-                    ]
-                        .map((e) => SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              padding: EdgeInsets.symmetric(vertical: 5),
-                              child: Text(e),
-                            ))
-                        .toList(),
-                  ),
-                ),
-              ],
+                'Name:',
+                'Directory:',
+                'Type:',
+                'Size:',
+                'Modified:',
+              ]
+                  .map((e) => Padding(
+                        padding: EdgeInsets.symmetric(vertical: 5),
+                        child: Text(e),
+                      ))
+                  .toList(),
+            ),
+            Divider(indent: 10),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  getFileNameFrom(curFile.path),
+                  curFile.absolute.path
+                      .substring(0, curFile.absolute.path.lastIndexOf('\\')),
+                  curFile.path.substring(curFile.path.lastIndexOf('.') + 1),
+                  fileSizeHumanReadable(curFile.lengthSync()),
+                  curFile.lastModifiedSync().toString(),
+                ]
+                    .map((e) => SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          child: Text(e),
+                        ))
+                    .toList(),
+              ),
             ),
           ],
         ),
-      );
-      break;
-    case ContextItem.help:
-      break;
-    case ContextItem.aboult:
-      break;
-    default:
-  }
+      ],
+    ),
+  );
 }

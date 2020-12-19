@@ -34,6 +34,10 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   int curIndex;
   File curFile;
 
+  bool _dialogOpen = false;
+  bool get dialogOpen => _dialogOpen;
+  set dialogOpen(bool value) => setState(() => _dialogOpen = value);
+
   void _animateRotLeft() {
     if (!_rotationController.isAnimating) {
       if (_rotationController.value == 0) {
@@ -82,6 +86,28 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
                 CallbakIntent(callback: _animateRotLeft),
             LogicalKeySet(LogicalKeyboardKey.arrowDown):
                 CallbakIntent(callback: _animateRotRight),
+            LogicalKeySet(
+                    LogicalKeyboardKey.controlLeft, LogicalKeyboardKey.keyO):
+                CallbakIntent(callback: () {
+              if (!dialogOpen) {
+                dialogOpen = true;
+                showOpenFileDialog().then((file) {
+                  iniFile(file);
+                  dialogOpen = false;
+                });
+              }
+            }),
+            LogicalKeySet(
+                    LogicalKeyboardKey.controlLeft, LogicalKeyboardKey.keyI):
+                CallbakIntent(callback: () {
+              if (!dialogOpen) {
+                if (curFile != null) {
+                  dialogOpen = true;
+                  showFileInfoDialog(context, curFile)
+                      .then((value) => dialogOpen = false);
+                }
+              }
+            }),
           }
         });
   }
@@ -109,6 +135,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
           updateTitle();
         }
       });
+      resetAllTransf();
     }
   }
 
@@ -163,14 +190,15 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
       body: ResetableIntViewer(
         transformationController: _transformationController,
         onRightClick: (Offset pos) {
-          showContextMenu(
+          if (!dialogOpen) {
+            dialogOpen = true;
+            showContextMenu(
               context: context,
               pos: pos,
               curFile: curFile,
-              onSelectFile: (file) {
-                iniFile(file);
-                resetAllTransf();
-              });
+              onSelectFile: iniFile,
+            ).then((value) => dialogOpen = false);
+          }
         },
         onDoubleClick: _animateResetRot,
         child: RotationTransition(

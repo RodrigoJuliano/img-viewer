@@ -108,6 +108,12 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
                 }
               }
             }),
+            LogicalKeySet(LogicalKeyboardKey.escape):
+                CallbakIntent(callback: () {
+              if (dialogOpen) {
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+            }),
           }
         });
   }

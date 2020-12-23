@@ -10,7 +10,17 @@ import 'App.dart';
 import 'ContextMenu.dart';
 import 'ResetableIntViewer.dart';
 
-const suported_formats = ['png', 'jpg', 'gif', 'webp', 'bmp', 'wbmp', 'ico'];
+const suported_formats = [
+  'png',
+  'jpg',
+  '.jpeg',
+  '.jpe',
+  'gif',
+  'webp',
+  'bmp',
+  'wbmp',
+  'ico'
+];
 
 /// This is the stateful widget that the main application instantiates.
 class ImgViewer extends StatefulWidget {

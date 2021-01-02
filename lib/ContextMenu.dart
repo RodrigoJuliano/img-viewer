@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:file_chooser/file_chooser.dart';
+import 'package:file_selector/file_selector.dart';
 import 'ImgViewer.dart';
 import 'Utils.dart';
 
@@ -66,12 +66,19 @@ Future showContextMenu(
 }
 
 Future<String> showOpenFileDialog() {
-  return showOpenPanel(allowedFileTypes: [
-    FileTypeFilterGroup(label: 'Image', fileExtensions: suported_formats),
-    FileTypeFilterGroup(label: 'All files'),
-  ]).then((result) {
-    if (!result.canceled && result.paths.isNotEmpty)
-      return result.paths[0];
+  final XTypeGroup imgTypeGroup = XTypeGroup(
+    label: 'Image',
+    extensions: suported_formats,
+  );
+  final XTypeGroup allTypeGroup = XTypeGroup(
+    label: 'All files',
+    extensions: ['*'],
+  );
+
+  return openFile(acceptedTypeGroups: [imgTypeGroup, allTypeGroup])
+      .then((result) {
+    if (result != null && result.path != null)
+      return result.path;
     else
       return null;
   });

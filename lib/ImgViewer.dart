@@ -13,8 +13,8 @@ import 'ResetableIntViewer.dart';
 const suported_formats = [
   'png',
   'jpg',
-  '.jpeg',
-  '.jpe',
+  'jpeg',
+  'jpe',
   'gif',
   'webp',
   'bmp',
@@ -89,16 +89,16 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
           // Setup the shortcuts
           App.of(context).shortcuts = {
             LogicalKeySet(LogicalKeyboardKey.arrowLeft):
-                CallbakIntent(callback: () => goToImg(-1)),
+                CallbackIntent(callback: () => goToImg(-1)),
             LogicalKeySet(LogicalKeyboardKey.arrowRight):
-                CallbakIntent(callback: () => goToImg(1)),
+                CallbackIntent(callback: () => goToImg(1)),
             LogicalKeySet(LogicalKeyboardKey.arrowUp):
-                CallbakIntent(callback: _animateRotLeft),
+                CallbackIntent(callback: _animateRotLeft),
             LogicalKeySet(LogicalKeyboardKey.arrowDown):
-                CallbakIntent(callback: _animateRotRight),
+                CallbackIntent(callback: _animateRotRight),
             LogicalKeySet(
                     LogicalKeyboardKey.controlLeft, LogicalKeyboardKey.keyO):
-                CallbakIntent(callback: () {
+                CallbackIntent(callback: () {
               if (!dialogOpen) {
                 dialogOpen = true;
                 showOpenFileDialog().then((file) {
@@ -109,7 +109,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
             }),
             LogicalKeySet(
                     LogicalKeyboardKey.controlLeft, LogicalKeyboardKey.keyI):
-                CallbakIntent(callback: () {
+                CallbackIntent(callback: () {
               if (!dialogOpen) {
                 if (curFile != null) {
                   dialogOpen = true;
@@ -119,7 +119,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
               }
             }),
             LogicalKeySet(LogicalKeyboardKey.escape):
-                CallbakIntent(callback: () {
+                CallbackIntent(callback: () {
               if (dialogOpen) {
                 Navigator.of(context, rootNavigator: true).pop();
               }

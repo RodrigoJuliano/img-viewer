@@ -24,8 +24,8 @@ class _AppState extends State<App> {
     return MaterialApp(
       title: 'ImgViewer',
       actions: <Type, Action<Intent>>{
-        CallbakIntent: CallbackAction<CallbakIntent>(
-          onInvoke: (CallbakIntent intent) {
+        CallbackIntent: CallbackAction<CallbackIntent>(
+          onInvoke: (CallbackIntent intent) {
             return intent.callback();
           },
         ),

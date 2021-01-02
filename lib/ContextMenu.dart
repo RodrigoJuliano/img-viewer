@@ -55,8 +55,10 @@ Future showContextMenu(
         return showFileInfoDialog(context, curFile);
         break;
       case ContextItem.help:
+        return showHelpDialog(context);
         break;
       case ContextItem.aboult:
+        return showAboutDialog(context);
         break;
       default:
     }
@@ -76,62 +78,82 @@ Future<String> showOpenFileDialog() {
 }
 
 Future showFileInfoDialog(BuildContext context, File curFile) {
-  return showDialog(
+  return showCustomDialog(
+    title: 'File Info',
     context: context,
-    builder: (BuildContext context) => SimpleDialog(
-      title: Column(
+    children: [
+      Row(
         children: [
-          Text(
-            'File Info',
-            style: TextStyle(
-              fontSize: 18,
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              'Name:',
+              'Directory:',
+              'Type:',
+              'Size:',
+              'Modified:',
+            ]
+                .map((e) => Padding(
+                      padding: EdgeInsets.symmetric(vertical: 5),
+                      child: Text(e),
+                    ))
+                .toList(),
           ),
-          Divider(),
-        ],
-      ),
-      contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 12.0),
-      children: [
-        Row(
-          children: [
-            Column(
+          Divider(indent: 10),
+          Flexible(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                'Name:',
-                'Directory:',
-                'Type:',
-                'Size:',
-                'Modified:',
+                // Name
+                getFileNameFrom(curFile.path),
+                // Directory
+                curFile.absolute.path
+                    .substring(0, curFile.absolute.path.lastIndexOf('\\')),
+                // Type
+                curFile.path.substring(curFile.path.lastIndexOf('.') + 1),
+                // Size
+                fileSizeHumanReadable(curFile.lengthSync()),
+                // Modified
+                curFile.lastModifiedSync().toString().split('.')[0],
               ]
-                  .map((e) => Padding(
+                  .map((e) => SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
                         padding: EdgeInsets.symmetric(vertical: 5),
                         child: Text(e),
                       ))
                   .toList(),
             ),
-            Divider(indent: 10),
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  getFileNameFrom(curFile.path),
-                  curFile.absolute.path
-                      .substring(0, curFile.absolute.path.lastIndexOf('\\')),
-                  curFile.path.substring(curFile.path.lastIndexOf('.') + 1),
-                  fileSizeHumanReadable(curFile.lengthSync()),
-                  curFile.lastModifiedSync().toString(),
-                ]
-                    .map((e) => SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          padding: EdgeInsets.symmetric(vertical: 5),
-                          child: Text(e),
-                        ))
-                    .toList(),
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
+          ),
+        ],
+      ),
+    ],
   );
+}
+
+Future showHelpDialog(BuildContext context) {
+  return showCustomDialog(title: 'Help', context: context, children: []);
+}
+
+Future showAboutDialog(BuildContext context) {
+  return showCustomDialog(title: 'About', context: context, children: []);
+}
+
+Future showCustomDialog(
+    {String title, BuildContext context, List<Widget> children}) {
+  return showDialog(
+      context: context,
+      builder: (BuildContext context) => SimpleDialog(
+          title: Column(
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              Divider(),
+            ],
+          ),
+          contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 12.0),
+          children: children));
 }

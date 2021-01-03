@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
 import 'ImgViewer.dart';
 import 'Utils.dart';
+import 'Hyperlink.dart';
 
 enum ContextItem { openFile, fileInfo, help, aboult }
 
@@ -101,7 +102,7 @@ Future showFileInfoDialog(BuildContext context, File curFile) {
               'Modified:',
             ]
                 .map((e) => Padding(
-                      padding: EdgeInsets.symmetric(vertical: 5),
+                      padding: EdgeInsets.only(bottom: 5),
                       child: Text(e),
                     ))
                 .toList(),
@@ -125,7 +126,7 @@ Future showFileInfoDialog(BuildContext context, File curFile) {
               ]
                   .map((e) => SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.symmetric(vertical: 5),
+                        padding: EdgeInsets.only(bottom: 5),
                         child: Text(e),
                       ))
                   .toList(),
@@ -142,7 +143,34 @@ Future showHelpDialog(BuildContext context) {
 }
 
 Future showAboutDialog(BuildContext context) {
-  return showCustomDialog(title: 'About', context: context, children: []);
+  final linkColor = Colors.blueGrey;
+  final _spacer = () => SizedBox(
+        height: 10,
+      );
+
+  return showCustomDialog(title: 'About', context: context, children: [
+    Text('Version: v1.0.0'),
+    _spacer(),
+    Text('Changelog:'),
+    Hyperlink(
+      color: linkColor,
+      link: 'https://github.com/RodrigoJuliano/img-viewer/releases',
+    ),
+    _spacer(),
+    Text('Bug reports and feature requests:'),
+    Hyperlink(
+      color: linkColor,
+      link: 'https://github.com/RodrigoJuliano/img-viewer/issues',
+    ),
+    _spacer(),
+    Text('Source code on Github:'),
+    Hyperlink(
+      color: linkColor,
+      link: 'https://github.com/RodrigoJuliano/img-viewer',
+    ),
+    _spacer(),
+    Text('© 2021 RodrigoJuliano'),
+  ]);
 }
 
 Future showCustomDialog(
@@ -161,6 +189,6 @@ Future showCustomDialog(
               Divider(),
             ],
           ),
-          contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 12.0),
+          contentPadding: EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 10.0),
           children: children));
 }

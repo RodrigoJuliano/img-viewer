@@ -4,8 +4,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/gestures.dart';
 
 class Hyperlink extends StatefulWidget {
-  Hyperlink({Key key, this.color, this.text, @required this.link})
-      : super(key: key);
+  Hyperlink({
+    Key key,
+    this.color,
+    this.text,
+    @required this.link,
+  }) : super(key: key);
 
   final Color color;
   final String text;
@@ -38,9 +42,10 @@ class _HyperlinkState extends State<Hyperlink> {
       child: RichText(
         text: TextSpan(
           style: TextStyle(
-              color: widget.color,
-              decoration:
-                  _hovering ? TextDecoration.underline : TextDecoration.none),
+            color: widget.color,
+            decoration:
+                _hovering ? TextDecoration.underline : TextDecoration.none,
+          ),
           text: widget.text != null ? widget.text : widget.link,
           recognizer: TapGestureRecognizer()
             ..onTap = () async {

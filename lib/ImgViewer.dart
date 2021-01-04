@@ -19,7 +19,7 @@ const suported_formats = [
   'webp',
   'bmp',
   'wbmp',
-  'ico'
+  'ico',
 ];
 
 /// This is the stateful widget that the main application instantiates.
@@ -85,20 +85,27 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
     iniFile(widget.filepath);
 
     // To execute after fist frame (The App parent is builded after this widget)
-    WidgetsBinding.instance.addPostFrameCallback((_) => {
-          // Setup the shortcuts
-          App.of(context).shortcuts = {
-            LogicalKeySet(LogicalKeyboardKey.arrowLeft):
-                CallbackIntent(callback: () => goToImg(-1)),
-            LogicalKeySet(LogicalKeyboardKey.arrowRight):
-                CallbackIntent(callback: () => goToImg(1)),
-            LogicalKeySet(LogicalKeyboardKey.arrowUp):
-                CallbackIntent(callback: _animateRotLeft),
-            LogicalKeySet(LogicalKeyboardKey.arrowDown):
-                CallbackIntent(callback: _animateRotRight),
-            LogicalKeySet(
-                    LogicalKeyboardKey.controlLeft, LogicalKeyboardKey.keyO):
-                CallbackIntent(callback: () {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => {
+        // Setup the shortcuts
+        App.of(context).shortcuts = {
+          LogicalKeySet(LogicalKeyboardKey.arrowLeft): CallbackIntent(
+            callback: () => goToImg(-1),
+          ),
+          LogicalKeySet(LogicalKeyboardKey.arrowRight): CallbackIntent(
+            callback: () => goToImg(1),
+          ),
+          LogicalKeySet(LogicalKeyboardKey.arrowUp): CallbackIntent(
+            callback: _animateRotLeft,
+          ),
+          LogicalKeySet(LogicalKeyboardKey.arrowDown): CallbackIntent(
+            callback: _animateRotRight,
+          ),
+          LogicalKeySet(
+            LogicalKeyboardKey.controlLeft,
+            LogicalKeyboardKey.keyO,
+          ): CallbackIntent(
+            callback: () {
               if (!dialogOpen) {
                 dialogOpen = true;
                 showOpenFileDialog().then((file) {
@@ -106,10 +113,13 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
                   dialogOpen = false;
                 });
               }
-            }),
-            LogicalKeySet(
-                    LogicalKeyboardKey.controlLeft, LogicalKeyboardKey.keyI):
-                CallbackIntent(callback: () {
+            },
+          ),
+          LogicalKeySet(
+            LogicalKeyboardKey.controlLeft,
+            LogicalKeyboardKey.keyI,
+          ): CallbackIntent(
+            callback: () {
               if (!dialogOpen) {
                 if (curFile != null) {
                   dialogOpen = true;
@@ -117,15 +127,18 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
                       .then((value) => dialogOpen = false);
                 }
               }
-            }),
-            LogicalKeySet(LogicalKeyboardKey.escape):
-                CallbackIntent(callback: () {
+            },
+          ),
+          LogicalKeySet(LogicalKeyboardKey.escape): CallbackIntent(
+            callback: () {
               if (dialogOpen) {
                 Navigator.of(context, rootNavigator: true).pop();
               }
-            }),
-          }
-        });
+            },
+          ),
+        }
+      },
+    );
   }
 
   void iniFile(String filePath) {
@@ -224,8 +237,11 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
                   curFile,
                   scale: 1.0,
                   filterQuality: FilterQuality.none,
-                  errorBuilder: (BuildContext context, Object exception,
-                      StackTrace stackTrace) {
+                  errorBuilder: (
+                    BuildContext context,
+                    Object exception,
+                    StackTrace stackTrace,
+                  ) {
                     print('Error loading image');
                     print(exception.toString());
                     return Text('The image could not be loaded. 😢');
@@ -240,7 +256,8 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
               onPressRotLeft: _animateRotLeft,
               onPressRotRight: _animateRotRight,
               onPressPrev: () => goToImg(-1),
-              onPressNext: () => goToImg(1))
+              onPressNext: () => goToImg(1),
+            )
           : null,
     );
   }

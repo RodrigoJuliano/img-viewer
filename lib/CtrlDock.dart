@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'CtrlButton.dart';
 
 class CtrlDock extends StatefulWidget {
-  CtrlDock(
-      {Key key,
-      this.onPressRotLeft,
-      this.onPressRotRight,
-      this.onPressPrev,
-      this.onPressNext})
-      : super(key: key);
+  CtrlDock({
+    Key key,
+    this.onPressRotLeft,
+    this.onPressRotRight,
+    this.onPressPrev,
+    this.onPressNext,
+  }) : super(key: key);
 
   final VoidCallback onPressRotLeft;
   final VoidCallback onPressRotRight;
@@ -69,8 +69,9 @@ class _CtrlDockState extends State<CtrlDock>
               CtrlButton(
                 iconData: Icons.arrow_back,
                 borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(25),
-                    bottomLeft: Radius.circular(25)),
+                  topLeft: Radius.circular(25),
+                  bottomLeft: Radius.circular(25),
+                ),
                 onPress: widget.onPressPrev,
               ),
               CtrlButton(
@@ -86,8 +87,9 @@ class _CtrlDockState extends State<CtrlDock>
               CtrlButton(
                 iconData: Icons.arrow_forward,
                 borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(25),
-                    bottomRight: Radius.circular(25)),
+                  topRight: Radius.circular(25),
+                  bottomRight: Radius.circular(25),
+                ),
                 onPress: widget.onPressNext,
               ),
             ],

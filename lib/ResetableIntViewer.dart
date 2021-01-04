@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
 class ResetableIntViewer extends StatefulWidget {
-  ResetableIntViewer(
-      {Key key,
-      this.child,
-      @required this.transformationController,
-      this.onRightClick,
-      this.onDoubleClick})
-      : super(key: key);
+  ResetableIntViewer({
+    Key key,
+    this.child,
+    @required this.transformationController,
+    this.onRightClick,
+    this.onDoubleClick,
+  }) : super(key: key);
   final Widget child;
   final TransformationController transformationController;
   final void Function(Offset pos) onRightClick;

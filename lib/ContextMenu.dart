@@ -5,7 +5,12 @@ import 'ImgViewer.dart';
 import 'Utils.dart';
 import 'Hyperlink.dart';
 
-enum ContextItem { openFile, fileInfo, help, aboult }
+enum ContextItem {
+  openFile,
+  fileInfo,
+  help,
+  aboult,
+}
 
 List<PopupMenuEntry<ContextItem>> contextItens = [
   const PopupMenuItem<ContextItem>(
@@ -30,11 +35,12 @@ List<PopupMenuEntry<ContextItem>> contextItens = [
   ),
 ];
 
-Future showContextMenu(
-    {BuildContext context,
-    Offset pos,
-    File curFile,
-    void onSelectFile(String file)}) async {
+Future showContextMenu({
+  BuildContext context,
+  Offset pos,
+  File curFile,
+  void onSelectFile(String file),
+}) async {
   // Recreate the file info item. It can be enabled or disabled
   contextItens[1] = PopupMenuItem<ContextItem>(
     value: ContextItem.fileInfo,
@@ -44,10 +50,15 @@ Future showContextMenu(
   );
 
   return showMenu(
-          context: context,
-          position: RelativeRect.fromLTRB(pos.dx, pos.dy, pos.dx, pos.dy),
-          items: contextItens)
-      .then((selection) {
+    context: context,
+    position: RelativeRect.fromLTRB(
+      pos.dx,
+      pos.dy,
+      pos.dx,
+      pos.dy,
+    ),
+    items: contextItens,
+  ).then((selection) {
     switch (selection) {
       case ContextItem.openFile:
         return showOpenFileDialog().then((file) => onSelectFile(file));
@@ -76,8 +87,9 @@ Future<String> showOpenFileDialog() {
     extensions: ['*'],
   );
 
-  return openFile(acceptedTypeGroups: [imgTypeGroup, allTypeGroup])
-      .then((result) {
+  return openFile(
+    acceptedTypeGroups: [imgTypeGroup, allTypeGroup],
+  ).then((result) {
     if (result != null && result.path != null)
       return result.path;
     else
@@ -168,9 +180,7 @@ Future showHelpDialog(BuildContext context) {
 
 Future showAboutDialog(BuildContext context) {
   final linkColor = Colors.blueGrey;
-  final _spacer = () => SizedBox(
-        height: 10,
-      );
+  final _spacer = () => SizedBox(height: 10);
 
   final linkChangelog = 'https://github.com/RodrigoJuliano/img-viewer/releases';
   final linkIssues = 'https://github.com/RodrigoJuliano/img-viewer/issues';
@@ -206,20 +216,22 @@ Future showAboutDialog(BuildContext context) {
       TextButton(
         child: Text('Licenses'),
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute<void>(
-            builder: (context) => Theme(
-              data: Theme.of(context).copyWith(
-                textTheme: Typography.material2018(
-                  platform: Theme.of(context).platform,
-                ).black,
-                primaryColor: Colors.grey[900],
-              ),
-              child: LicensePage(
-                // applicationName: 'ImageViewer',
-                applicationLegalese: '© 2021 RodrigoJuliano',
+          Navigator.of(context).push(
+            MaterialPageRoute<void>(
+              builder: (context) => Theme(
+                data: Theme.of(context).copyWith(
+                  textTheme: Typography.material2018(
+                    platform: Theme.of(context).platform,
+                  ).black,
+                  primaryColor: Colors.grey[900],
+                ),
+                child: LicensePage(
+                  // applicationName: 'ImageViewer',
+                  applicationLegalese: '© 2021 RodrigoJuliano',
+                ),
               ),
             ),
-          ));
+          );
         },
       ),
       TextButton(
@@ -232,11 +244,12 @@ Future showAboutDialog(BuildContext context) {
   );
 }
 
-Future showCustomDialog(
-    {@required String title,
-    @required BuildContext context,
-    List<Widget> content = const [],
-    List<Widget> actions = const []}) {
+Future showCustomDialog({
+  @required String title,
+  @required BuildContext context,
+  List<Widget> content = const [],
+  List<Widget> actions = const [],
+}) {
   return showDialog(
     context: context,
     builder: (BuildContext context) => SimpleDialog(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CtrlButton extends FlatButton {
+class CtrlButton extends StatelessWidget {
   CtrlButton({this.iconData, this.borderRadius, this.onPress});
   final IconData iconData;
   final BorderRadius borderRadius;
@@ -8,20 +8,22 @@ class CtrlButton extends FlatButton {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      minWidth: 0,
-      child: Icon(
-        iconData,
-        color: Colors.grey[600],
+    return ElevatedButton(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 7, horizontal: 5),
+        child: Icon(
+          iconData,
+          color: Theme.of(context).iconTheme.color,
+        ),
       ),
-      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
       onPressed: onPress,
-      color: Colors.grey[900],
-      highlightColor: Colors.grey[850],
-      hoverColor: Color.fromARGB(255, 30, 30, 30),
-      shape: RoundedRectangleBorder(
-        borderRadius: borderRadius,
-      ),
+      style: Theme.of(context).elevatedButtonTheme.style.copyWith(
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: borderRadius,
+              ),
+            ),
+          ),
     );
   }
 }

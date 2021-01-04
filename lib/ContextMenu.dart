@@ -89,7 +89,7 @@ Future showFileInfoDialog(BuildContext context, File curFile) {
   return showCustomDialog(
     title: 'File Info',
     context: context,
-    children: [
+    content: [
       Row(
         children: [
           Column(
@@ -101,10 +101,12 @@ Future showFileInfoDialog(BuildContext context, File curFile) {
               'Size:',
               'Modified:',
             ]
-                .map((e) => Padding(
-                      padding: EdgeInsets.only(bottom: 5),
-                      child: Text(e),
-                    ))
+                .map(
+                  (e) => Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text(e),
+                  ),
+                )
                 .toList(),
           ),
           Divider(indent: 10),
@@ -124,22 +126,44 @@ Future showFileInfoDialog(BuildContext context, File curFile) {
                 // Modified
                 curFile.lastModifiedSync().toString().split('.')[0],
               ]
-                  .map((e) => SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        padding: EdgeInsets.only(bottom: 5),
-                        child: Text(e),
-                      ))
+                  .map(
+                    (e) => SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.only(bottom: 5),
+                      child: Text(e),
+                    ),
+                  )
                   .toList(),
             ),
           ),
         ],
       ),
     ],
+    actions: [
+      TextButton(
+        child: Text('Close'),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    ],
   );
 }
 
 Future showHelpDialog(BuildContext context) {
-  return showCustomDialog(title: 'Help', context: context, children: []);
+  return showCustomDialog(
+    title: 'Help',
+    context: context,
+    content: [],
+    actions: [
+      TextButton(
+        child: Text('Close'),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    ],
+  );
 }
 
 Future showAboutDialog(BuildContext context) {
@@ -148,47 +172,94 @@ Future showAboutDialog(BuildContext context) {
         height: 10,
       );
 
-  return showCustomDialog(title: 'About', context: context, children: [
-    Text('Version: v1.0.0'),
-    _spacer(),
-    Text('Changelog:'),
-    Hyperlink(
-      color: linkColor,
-      link: 'https://github.com/RodrigoJuliano/img-viewer/releases',
-    ),
-    _spacer(),
-    Text('Bug reports and feature requests:'),
-    Hyperlink(
-      color: linkColor,
-      link: 'https://github.com/RodrigoJuliano/img-viewer/issues',
-    ),
-    _spacer(),
-    Text('Source code on Github:'),
-    Hyperlink(
-      color: linkColor,
-      link: 'https://github.com/RodrigoJuliano/img-viewer',
-    ),
-    _spacer(),
-    Text('© 2021 RodrigoJuliano'),
-  ]);
+  final linkChangelog = 'https://github.com/RodrigoJuliano/img-viewer/releases';
+  final linkIssues = 'https://github.com/RodrigoJuliano/img-viewer/issues';
+  final linkSource = 'https://github.com/RodrigoJuliano/img-viewer';
+
+  return showCustomDialog(
+    title: 'About',
+    context: context,
+    content: [
+      Text('Version: v1.0.0'),
+      _spacer(),
+      Text('Changelog:'),
+      Hyperlink(
+        color: linkColor,
+        link: linkChangelog,
+      ),
+      _spacer(),
+      Text('Bug reports and feature requests:'),
+      Hyperlink(
+        color: linkColor,
+        link: linkIssues,
+      ),
+      _spacer(),
+      Text('Source code on Github:'),
+      Hyperlink(
+        color: linkColor,
+        link: linkSource,
+      ),
+      _spacer(),
+      Text('© 2021 RodrigoJuliano'),
+    ],
+    actions: [
+      TextButton(
+        child: Text('Licenses'),
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute<void>(
+            builder: (context) => Theme(
+              data: Theme.of(context).copyWith(
+                textTheme: Typography.material2018(
+                  platform: Theme.of(context).platform,
+                ).black,
+                primaryColor: Colors.grey[900],
+              ),
+              child: LicensePage(
+                // applicationName: 'ImageViewer',
+                applicationLegalese: '© 2021 RodrigoJuliano',
+              ),
+            ),
+          ));
+        },
+      ),
+      TextButton(
+        child: Text('Close'),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    ],
+  );
 }
 
 Future showCustomDialog(
-    {String title, BuildContext context, List<Widget> children}) {
+    {@required String title,
+    @required BuildContext context,
+    List<Widget> content = const [],
+    List<Widget> actions = const []}) {
   return showDialog(
-      context: context,
-      builder: (BuildContext context) => SimpleDialog(
-          title: Column(
-            children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              Divider(),
-            ],
+    context: context,
+    builder: (BuildContext context) => SimpleDialog(
+      title: Column(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+            ),
           ),
-          contentPadding: EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 10.0),
-          children: children));
+          Divider(),
+        ],
+      ),
+      contentPadding: EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 10.0),
+      children: [
+        ...content,
+        Wrap(
+          alignment: WrapAlignment.end,
+          spacing: 5,
+          children: actions,
+        ),
+      ],
+    ),
+  );
 }

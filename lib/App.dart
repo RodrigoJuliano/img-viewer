@@ -33,21 +33,31 @@ class _AppState extends State<App> {
       shortcuts: _shortcuts,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.black,
-        dialogTheme: DialogTheme(
-          backgroundColor: Colors.grey[900],
-          titleTextStyle: TextStyle(color: Colors.grey[400]),
-          // contentTextStyle:
-        ),
-        dividerColor: Colors.black45,
-        dividerTheme: DividerThemeData(endIndent: 5, indent: 5),
-        popupMenuTheme: PopupMenuThemeData(color: Colors.grey[900]),
-        disabledColor: Colors.grey[600],
-        textTheme: TextTheme(
-            bodyText2: TextStyle(color: Colors.grey[400], fontSize: 16),
-            subtitle1: TextStyle(color: Colors.grey[400], fontSize: 16),
-            headline6: TextStyle(color: Colors.grey[400])),
-      ),
+          scaffoldBackgroundColor: Colors.black,
+          dialogTheme: DialogTheme(
+            backgroundColor: Colors.grey[900],
+            titleTextStyle: TextStyle(color: Colors.grey[400]),
+            // contentTextStyle:
+          ),
+          dividerColor: Colors.black45,
+          dividerTheme: DividerThemeData(endIndent: 5, indent: 5),
+          popupMenuTheme: PopupMenuThemeData(color: Colors.grey[900]),
+          disabledColor: Colors.grey[600],
+          textTheme: TextTheme(
+              bodyText2: TextStyle(color: Colors.grey[400], fontSize: 16),
+              subtitle1: TextStyle(color: Colors.grey[400], fontSize: 16),
+              headline6: TextStyle(color: Colors.grey[400])),
+          iconTheme: IconThemeData(color: Colors.grey[500]),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              primary: Colors.grey[900],
+            ),
+          ),
+          textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+            primary: Colors.blueGrey,
+            textStyle: TextStyle(fontSize: 16),
+          ))),
       home: ImgViewer(filepath: widget.filepath),
     );
   }

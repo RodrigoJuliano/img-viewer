@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 class CtrlButton extends StatelessWidget {
   CtrlButton({
     this.iconData,
-    this.borderRadius,
     this.onPress,
   });
   final IconData iconData;
-  final BorderRadius borderRadius;
   final VoidCallback onPress;
 
   @override
@@ -27,9 +25,10 @@ class CtrlButton extends StatelessWidget {
       style: Theme.of(context).elevatedButtonTheme.style.copyWith(
             shape: MaterialStateProperty.all(
               RoundedRectangleBorder(
-                borderRadius: borderRadius,
+                borderRadius: BorderRadius.zero,
               ),
             ),
+            elevation: MaterialStateProperty.all(0.0),
           ),
     );
   }

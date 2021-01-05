@@ -63,36 +63,34 @@ class _CtrlDockState extends State<CtrlDock>
         // color: Colors.red,
         child: SlideTransition(
           position: _offsetAnimation,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CtrlButton(
-                iconData: Icons.arrow_back,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(25),
-                  bottomLeft: Radius.circular(25),
-                ),
-                onPress: widget.onPressPrev,
+          child: FittedBox(
+            fit: BoxFit.none,
+            child: Material(
+              clipBehavior: Clip.antiAlias,
+              elevation: 10,
+              borderRadius: BorderRadius.all(Radius.circular(25)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CtrlButton(
+                    iconData: Icons.arrow_back,
+                    onPress: widget.onPressPrev,
+                  ),
+                  CtrlButton(
+                    iconData: Icons.rotate_left,
+                    onPress: widget.onPressRotLeft,
+                  ),
+                  CtrlButton(
+                    iconData: Icons.rotate_right,
+                    onPress: widget.onPressRotRight,
+                  ),
+                  CtrlButton(
+                    iconData: Icons.arrow_forward,
+                    onPress: widget.onPressNext,
+                  ),
+                ],
               ),
-              CtrlButton(
-                iconData: Icons.rotate_left,
-                borderRadius: BorderRadius.zero,
-                onPress: widget.onPressRotLeft,
-              ),
-              CtrlButton(
-                iconData: Icons.rotate_right,
-                borderRadius: BorderRadius.zero,
-                onPress: widget.onPressRotRight,
-              ),
-              CtrlButton(
-                iconData: Icons.arrow_forward,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(25),
-                  bottomRight: Radius.circular(25),
-                ),
-                onPress: widget.onPressNext,
-              ),
-            ],
+            ),
           ),
         ),
       ),

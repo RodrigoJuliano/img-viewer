@@ -179,7 +179,7 @@ Future showHelpDialog(BuildContext context) {
 }
 
 Future showAboutDialog(BuildContext context) {
-  final linkColor = Colors.blueGrey;
+  final linkColor = Theme.of(context).accentColor;
   final _spacer = () => SizedBox(height: 10);
 
   final linkChangelog = 'https://github.com/RodrigoJuliano/img-viewer/releases';
@@ -220,13 +220,16 @@ Future showAboutDialog(BuildContext context) {
             MaterialPageRoute<void>(
               builder: (context) => Theme(
                 data: Theme.of(context).copyWith(
-                  textTheme: Typography.material2018(
-                    platform: Theme.of(context).platform,
-                  ).black,
-                  primaryColor: Colors.grey[900],
+                  appBarTheme: AppBarTheme(
+                    color: Theme.of(context).colorScheme.surface,
+                    iconTheme: IconThemeData(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                    textTheme: Theme.of(context).textTheme,
+                  ),
                 ),
                 child: LicensePage(
-                  // applicationName: 'ImageViewer',
+                  applicationName: 'ImageViewer',
                   applicationLegalese: '© 2021 RodrigoJuliano',
                 ),
               ),
@@ -261,7 +264,10 @@ Future showCustomDialog({
               fontSize: 18,
             ),
           ),
-          Divider(),
+          Divider(
+            indent: 0,
+            endIndent: 0,
+          ),
         ],
       ),
       contentPadding: EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 10.0),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'ImgViewer.dart';
 import 'Utils.dart';
 import 'ThemeData.dart';
+import 'Settings.dart';
 
 class App extends StatefulWidget {
   App(this.filepath);
@@ -22,22 +24,29 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ImgViewer',
-      actions: <Type, Action<Intent>>{
-        CallbackIntent: CallbackAction<CallbackIntent>(
-          onInvoke: (CallbackIntent intent) {
-            return intent.callback();
-          },
-        ),
-      },
-      shortcuts: _shortcuts,
-      debugShowCheckedModeBanner: false,
-      theme: IVThemeData.lightThemeData,
-      darkTheme: IVThemeData.darkThemeData,
-      themeMode: ThemeMode.dark,
-      home: ImgViewer(
-        filepath: widget.filepath,
+    return ChangeNotifierProvider(
+      create: (_) => SettingsProvider(),
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            title: 'ImgViewer',
+            actions: <Type, Action<Intent>>{
+              CallbackIntent: CallbackAction<CallbackIntent>(
+                onInvoke: (CallbackIntent intent) {
+                  return intent.callback();
+                },
+              ),
+            },
+            shortcuts: _shortcuts,
+            debugShowCheckedModeBanner: false,
+            theme: IVThemeData.lightThemeData,
+            darkTheme: IVThemeData.darkThemeData,
+            themeMode: context.watch<SettingsProvider>().settings?.themeMode,
+            home: ImgViewer(
+              filepath: widget.filepath,
+            ),
+          );
+        },
       ),
     );
   }

@@ -1,13 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:provider/provider.dart';
 import 'ImgViewer.dart';
 import 'Utils.dart';
 import 'Hyperlink.dart';
+import 'Settings.dart';
 
 enum ContextItem {
   openFile,
   fileInfo,
+  settings,
   help,
   aboult,
 }
@@ -23,6 +26,11 @@ List<PopupMenuEntry<ContextItem>> contextItens = [
     child: null,
   ),
   const PopupMenuDivider(),
+  const PopupMenuItem<ContextItem>(
+    value: ContextItem.settings,
+    child: Text('Settings'),
+    height: 30,
+  ),
   const PopupMenuItem<ContextItem>(
     value: ContextItem.help,
     child: Text('Help'),
@@ -65,6 +73,9 @@ Future showContextMenu({
         break;
       case ContextItem.fileInfo:
         return showFileInfoDialog(context, curFile);
+        break;
+      case ContextItem.settings:
+        return showSettingsDialog(context);
         break;
       case ContextItem.help:
         return showHelpDialog(context);
@@ -237,6 +248,83 @@ Future showAboutDialog(BuildContext context) {
           );
         },
       ),
+      TextButton(
+        child: Text('Close'),
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    ],
+  );
+}
+
+Future showSettingsDialog(BuildContext context) {
+  return showCustomDialog(
+    title: 'Settings',
+    context: context,
+    content: [
+      Table(
+        defaultColumnWidth: IntrinsicColumnWidth(),
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        children: [
+          TableRow(
+            children: <Widget>[
+              Text(
+                'Theme',
+                style: TextStyle(fontSize: 16),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints(minHeight: 40),
+                child: Builder(
+                  builder: (BuildContext context) {
+                    return DropdownButton<ThemeMode>(
+                      items: [
+                        DropdownMenuItem(
+                          child: Text('Dark'),
+                          value: ThemeMode.dark,
+                        ),
+                        DropdownMenuItem(
+                          child: Text('Light'),
+                          value: ThemeMode.light,
+                        ),
+                        DropdownMenuItem(
+                          child: Text('System'),
+                          value: ThemeMode
+                              .system, // Currently does not work on Windows
+                        ),
+                      ],
+                      value:
+                          context.watch<SettingsProvider>().settings.themeMode,
+                      onChanged: (value) {
+                        var provider = context.read<SettingsProvider>();
+                        provider.settings =
+                            provider.settings.copyWith(themeMode: value);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          TableRow(
+            decoration: BoxDecoration(),
+            children: [
+              Text(
+                'Associate with suported files',
+                style: TextStyle(fontSize: 16),
+                // overflow: TextOverflow.ellipsis,
+                softWrap: true,
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints(minHeight: 40),
+                child: Checkbox(value: true, onChanged: (value) {}),
+              ),
+            ],
+          ),
+        ],
+      )
+    ],
+    actions: [
       TextButton(
         child: Text('Close'),
         onPressed: () {

@@ -48,6 +48,7 @@ class IVThemeData {
           ),
         ),
       ),
+      toggleableActiveColor: colorScheme.primary,
     );
   }
 

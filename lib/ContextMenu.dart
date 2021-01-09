@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:provider/provider.dart';
@@ -276,6 +277,7 @@ Future showSettingsDialog(BuildContext context) {
               ConstrainedBox(
                 constraints: BoxConstraints(minHeight: 40),
                 child: Builder(
+                  // Builder to allow the use of context.watch
                   builder: (BuildContext context) {
                     return DropdownButton<ThemeMode>(
                       items: [
@@ -293,10 +295,12 @@ Future showSettingsDialog(BuildContext context) {
                               .system, // Currently does not work on Windows
                         ),
                       ],
+                      // Gets the value from the settings
                       value:
                           context.watch<SettingsProvider>().settings.themeMode,
                       onChanged: (value) {
-                        var provider = context.read<SettingsProvider>();
+                        // Updates the value in the settings
+                        final provider = context.read<SettingsProvider>();
                         provider.settings =
                             provider.settings.copyWith(themeMode: value);
                       },
@@ -307,7 +311,6 @@ Future showSettingsDialog(BuildContext context) {
             ],
           ),
           TableRow(
-            decoration: BoxDecoration(),
             children: [
               Text(
                 'Associate with suported files',
@@ -317,7 +320,46 @@ Future showSettingsDialog(BuildContext context) {
               ),
               ConstrainedBox(
                 constraints: BoxConstraints(minHeight: 40),
-                child: Checkbox(value: true, onChanged: (value) {}),
+                child: Builder(
+                  // Builder to allow the use of context.watch
+                  builder: (BuildContext context) {
+                    return Checkbox(
+                      // Gets the value from the settings
+                      value: context
+                          .watch<SettingsProvider>()
+                          .settings
+                          .associatedWithFileTypes,
+                      onChanged: (value) {
+                        // Updates the value in the settings
+                        final provider = context.read<SettingsProvider>();
+                        provider.settings = provider.settings
+                            .copyWith(associatedWithFileTypes: value);
+
+                        // Run the (un)installation script
+                        try {
+                          // Run scripts only in release mode
+                          // To execute them in other modes, some adaptations are necessary
+                          if (Platform.isWindows && kReleaseMode) {
+                            Process.run(
+                              value
+                                  ? 'scripts\\install.bat'
+                                  : 'scripts\\uninstall.bat',
+                              [],
+                            ).then(
+                              (ProcessResult result) {
+                                print(result.exitCode);
+                                print(result.stdout);
+                                print(result.stderr);
+                              },
+                            );
+                          }
+                        } on ProcessException catch (e) {
+                          print(e?.message);
+                        }
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

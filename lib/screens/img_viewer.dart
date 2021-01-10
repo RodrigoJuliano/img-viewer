@@ -1,15 +1,19 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
+
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../components/control_dock.dart';
-import '../utils.dart';
+
 import '../app.dart';
 import '../components/context_menu.dart';
-import '../components/resetable_Interactive_viewer.dart';
+import '../components/control_dock.dart';
+import '../components/resetable_interactive_viewer.dart';
 import '../constants.dart';
+import '../utils.dart';
+import 'file_info_dialog.dart';
+import 'open_file_dialog.dart';
 
 /// This is the stateful widget that the main application instantiates.
 class ImgViewer extends StatefulWidget {
@@ -56,10 +60,11 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   }
 
   void _animateResetRot() {
-    if (_rotationController.value < 0.5)
+    if (_rotationController.value < 0.5) {
       _rotationController.animateTo(0.0, duration: Duration(milliseconds: 200));
-    else
+    } else {
       _rotationController.animateTo(1.0);
+    }
   }
 
   @override
@@ -139,11 +144,11 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
           imgsCurDir = curFile.parent.listSync().where((f) {
             if (f is File) {
               // Last 5 chars in lowercase
-              String _end = f.path
+              var _end = f.path
                   .substring(f.path.length - 5, f.path.length)
                   .toLowerCase();
               // Check if it ends with one of the supported extensions
-              return suported_formats.any((e) => _end.endsWith('.' + e));
+              return suportedFormats.any((e) => _end.endsWith('.$e'));
             } else {
               return false;
             }
@@ -166,7 +171,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   }
 
   void updateTitle() {
-    appWindow.title = "ImgViewer - " + getFileNameFrom(curFile.path);
+    appWindow.title = "ImgViewer - ${getFileNameFrom(curFile.path)}";
   }
 
   // 1 for the next img, -1 for previous one
@@ -175,20 +180,20 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
       resetAllTransf();
       if (dir > 0) {
         setState(() {
-          if (curIndex < imgsCurDir.length - 1)
+          if (curIndex < imgsCurDir.length - 1) {
             curIndex++;
-          else
+          } else {
             curIndex = 0;
-
+          }
           curFile = imgsCurDir[curIndex];
         });
       } else {
         setState(() {
-          if (curIndex > 0)
+          if (curIndex > 0) {
             curIndex--;
-          else
+          } else {
             curIndex = imgsCurDir.length - 1;
-
+          }
           curFile = imgsCurDir[curIndex];
         });
       }

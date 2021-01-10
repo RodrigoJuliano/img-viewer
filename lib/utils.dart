@@ -11,16 +11,16 @@ class CallbackIntent extends Intent {
 }
 
 String fileSizeHumanReadable(int bytes) {
-  double kbs = bytes / 1024;
+  var kbs = bytes / 1024;
   if (kbs < 1024) {
-    return kbs.toStringAsFixed(2) + ' KBs';
+    return '${kbs.toStringAsFixed(2)} KBs';
   } else {
-    double mbs = kbs / 1024;
+    var mbs = kbs / 1024;
     if (mbs < 1024) {
-      return mbs.toStringAsFixed(2) + ' MBs';
+      return '${mbs.toStringAsFixed(2)} MBs';
     } else {
-      double gbs = kbs / 1024;
-      return gbs.toStringAsFixed(2) + ' GBs';
+      var gbs = kbs / 1024;
+      return '${gbs.toStringAsFixed(2)} GBs';
     }
   }
 }

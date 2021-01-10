@@ -1,9 +1,11 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../models/settings.dart';
 
-class SettingsProvider with ChangeNotifier {
+class SettingsProvider extends ChangeNotifier {
   var _settings = Settings();
 
   SettingsProvider() {
@@ -19,12 +21,12 @@ class SettingsProvider with ChangeNotifier {
   }
 
   Future updateSharedPrefrences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     await prefs.setString('settings', json.encode(_settings.toJson()));
   }
 
   Future syncDataWithProvider() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var prefs = await SharedPreferences.getInstance();
     var result = prefs.getString('settings');
 
     if (result != null) {

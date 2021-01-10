@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'screens/img_viewer.dart';
-import 'utils.dart';
-import 'theme/theme_data.dart';
+
 import 'providers/settings_provider.dart';
+import 'screens/img_viewer.dart';
+import 'theme/theme_data.dart' as theme;
+import 'utils.dart';
 
 class App extends StatefulWidget {
   App(this.filepath);
@@ -18,6 +19,8 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   Map<LogicalKeySet, Intent> _shortcuts;
+
+  Map<LogicalKeySet, Intent> get shortcuts => _shortcuts;
 
   set shortcuts(Map<LogicalKeySet, Intent> value) =>
       setState(() => _shortcuts = value);
@@ -39,8 +42,8 @@ class _AppState extends State<App> {
             },
             shortcuts: _shortcuts,
             debugShowCheckedModeBanner: false,
-            theme: IVThemeData.lightThemeData,
-            darkTheme: IVThemeData.darkThemeData,
+            theme: theme.lightThemeData,
+            darkTheme: theme.darkThemeData,
             themeMode: context.watch<SettingsProvider>().settings?.themeMode,
             home: ImgViewer(
               filepath: widget.filepath,

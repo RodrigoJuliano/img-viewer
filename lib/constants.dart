@@ -1,4 +1,4 @@
-const suported_formats = [
+const suportedFormats = [
   'png',
   'jpg',
   'jpeg',
@@ -9,3 +9,7 @@ const suported_formats = [
   'wbmp',
   'ico',
 ];
+
+const linkChangelog = 'https://github.com/RodrigoJuliano/img-viewer/releases';
+const linkIssues = 'https://github.com/RodrigoJuliano/img-viewer/issues';
+const linkSource = 'https://github.com/RodrigoJuliano/img-viewer';

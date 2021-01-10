@@ -4,23 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/services.dart';
-import 'CtrlDock.dart';
-import 'Utils.dart';
-import 'App.dart';
-import 'ContextMenu.dart';
-import 'ResetableIntViewer.dart';
-
-const suported_formats = [
-  'png',
-  'jpg',
-  'jpeg',
-  'jpe',
-  'gif',
-  'webp',
-  'bmp',
-  'wbmp',
-  'ico',
-];
+import '../components/control_dock.dart';
+import '../utils.dart';
+import '../app.dart';
+import '../components/context_menu.dart';
+import '../components/resetable_Interactive_viewer.dart';
+import '../constants.dart';
 
 /// This is the stateful widget that the main application instantiates.
 class ImgViewer extends StatefulWidget {
@@ -216,7 +205,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ResetableIntViewer(
+      body: ResetableInteractiveViewer(
         transformationController: _transformationController,
         onRightClick: (Offset pos) {
           if (!dialogOpen) {
@@ -252,7 +241,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: curFile != null
-          ? CtrlDock(
+          ? ControlDock(
               onPressRotLeft: _animateRotLeft,
               onPressRotRight: _animateRotRight,
               onPressPrev: () => goToImg(-1),

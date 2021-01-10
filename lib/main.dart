@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'App.dart';
+import 'app.dart';
 
 void main(List<String> args) {
   String filepath;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 
-class ResetableIntViewer extends StatefulWidget {
-  ResetableIntViewer({
+class ResetableInteractiveViewer extends StatefulWidget {
+  ResetableInteractiveViewer({
     Key key,
     this.child,
     @required this.transformationController,
@@ -15,10 +15,11 @@ class ResetableIntViewer extends StatefulWidget {
   final VoidCallback onDoubleClick;
 
   @override
-  _ResetableIntViewerState createState() => _ResetableIntViewerState();
+  _ResetableInteractiveViewerState createState() =>
+      _ResetableInteractiveViewerState();
 }
 
-class _ResetableIntViewerState extends State<ResetableIntViewer>
+class _ResetableInteractiveViewerState extends State<ResetableInteractiveViewer>
     with TickerProviderStateMixin {
   Animation<Matrix4> _animationReset;
   AnimationController _controllerReset;

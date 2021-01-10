@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'CtrlButton.dart';
+import 'control_button.dart';
 
-class CtrlDock extends StatefulWidget {
-  CtrlDock({
+class ControlDock extends StatefulWidget {
+  ControlDock({
     Key key,
     this.onPressRotLeft,
     this.onPressRotRight,
@@ -16,11 +16,11 @@ class CtrlDock extends StatefulWidget {
   final VoidCallback onPressNext;
 
   @override
-  _CtrlDockState createState() => _CtrlDockState();
+  _ControlDockState createState() => _ControlDockState();
 }
 
 /// This is the private State class that goes with AnimatedCtrl.
-class _CtrlDockState extends State<CtrlDock>
+class _ControlDockState extends State<ControlDock>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   Animation<Offset> _offsetAnimation;
@@ -72,19 +72,19 @@ class _CtrlDockState extends State<CtrlDock>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CtrlButton(
+                  ControlButton(
                     iconData: Icons.arrow_back,
                     onPress: widget.onPressPrev,
                   ),
-                  CtrlButton(
+                  ControlButton(
                     iconData: Icons.rotate_left,
                     onPress: widget.onPressRotLeft,
                   ),
-                  CtrlButton(
+                  ControlButton(
                     iconData: Icons.rotate_right,
                     onPress: widget.onPressRotRight,
                   ),
-                  CtrlButton(
+                  ControlButton(
                     iconData: Icons.arrow_forward,
                     onPress: widget.onPressNext,
                   ),

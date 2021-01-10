@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'ImgViewer.dart';
-import 'Utils.dart';
-import 'ThemeData.dart';
-import 'Settings.dart';
+import 'screens/img_viewer.dart';
+import 'utils.dart';
+import 'theme/theme_data.dart';
+import 'providers/settings_provider.dart';
 
 class App extends StatefulWidget {
   App(this.filepath);

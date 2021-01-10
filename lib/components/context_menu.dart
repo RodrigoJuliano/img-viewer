@@ -3,10 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:provider/provider.dart';
-import 'ImgViewer.dart';
-import 'Utils.dart';
-import 'Hyperlink.dart';
-import 'Settings.dart';
+import '../constants.dart';
+import '../utils.dart';
+import '../providers/settings_provider.dart';
+import 'hyperlink.dart';
 
 enum ContextItem {
   openFile,

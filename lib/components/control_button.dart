@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CtrlButton extends StatelessWidget {
-  CtrlButton({
+class ControlButton extends StatelessWidget {
+  ControlButton({
     this.iconData,
     this.onPress,
   });

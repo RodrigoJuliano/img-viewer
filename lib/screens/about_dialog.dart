@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../components/custom_dialog.dart';
 import '../components/hyperlink.dart';
@@ -8,35 +9,39 @@ Future showAboutDialog(BuildContext context) {
   final linkColor = Theme.of(context).accentColor;
   SizedBox _spacer() => SizedBox(height: 10);
 
+  final localization = AppLocalizations.of(context);
+
+  const legalese = '© 2021 RodrigoJuliano';
+
   return showCustomDialog(
-    title: 'About',
+    title: localization.aboutDialogTitle,
     context: context,
     content: [
-      Text('Version: v1.0.0'),
+      Text('${localization.aboutVersion} $version'),
       _spacer(),
-      Text('Changelog:'),
+      Text(localization.aboutChangelog),
       Hyperlink(
         color: linkColor,
         link: linkChangelog,
       ),
       _spacer(),
-      Text('Bug reports and feature requests:'),
+      Text(localization.aboutBugReportsFeatureRequests),
       Hyperlink(
         color: linkColor,
         link: linkIssues,
       ),
       _spacer(),
-      Text('Source code on Github:'),
+      Text(localization.aboutSourceCodeGithub),
       Hyperlink(
         color: linkColor,
         link: linkSource,
       ),
       _spacer(),
-      Text('© 2021 RodrigoJuliano'),
+      Text(legalese),
     ],
     actions: [
       TextButton(
-        child: Text('Licenses'),
+        child: Text(localization.aboutLicensesButton),
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute<void>(
@@ -52,7 +57,7 @@ Future showAboutDialog(BuildContext context) {
                 ),
                 child: LicensePage(
                   applicationName: 'ImageViewer',
-                  applicationLegalese: '© 2021 RodrigoJuliano',
+                  applicationLegalese: legalese,
                 ),
               ),
             ),
@@ -60,7 +65,7 @@ Future showAboutDialog(BuildContext context) {
         },
       ),
       TextButton(
-        child: Text('Close'),
+        child: Text(localization.dialogCloseButton),
         onPressed: () {
           Navigator.pop(context);
         },

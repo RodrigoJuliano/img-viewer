@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../screens/about_dialog.dart' as about;
 import '../screens/file_info_dialog.dart';
@@ -16,47 +17,43 @@ enum ContextItem {
   aboult,
 }
 
-List<PopupMenuEntry<ContextItem>> contextItens = [
-  const PopupMenuItem<ContextItem>(
-    value: ContextItem.openFile,
-    child: Text('Open file'),
-    height: 30,
-  ),
-  // Placeholder for file info
-  const PopupMenuItem<ContextItem>(
-    child: null,
-  ),
-  const PopupMenuDivider(),
-  const PopupMenuItem<ContextItem>(
-    value: ContextItem.settings,
-    child: Text('Settings'),
-    height: 30,
-  ),
-  const PopupMenuItem<ContextItem>(
-    value: ContextItem.help,
-    child: Text('Help'),
-    height: 30,
-  ),
-  const PopupMenuItem<ContextItem>(
-    value: ContextItem.aboult,
-    child: Text('About'),
-    height: 30,
-  ),
-];
-
 Future showContextMenu({
   BuildContext context,
   Offset pos,
   File curFile,
   void onSelectFile(String file),
 }) {
-  // Recreate the file info item. It can be enabled or disabled
-  contextItens[1] = PopupMenuItem<ContextItem>(
-    value: ContextItem.fileInfo,
-    child: Text('File info'),
-    height: 30,
-    enabled: curFile != null,
-  );
+  final localization = AppLocalizations.of(context);
+
+  final contextItens = <PopupMenuEntry<ContextItem>>[
+    PopupMenuItem<ContextItem>(
+      value: ContextItem.openFile,
+      child: Text(localization.contextMenuOpenFile),
+      height: 30,
+    ),
+    PopupMenuItem<ContextItem>(
+      value: ContextItem.fileInfo,
+      child: Text(localization.contextMenuFileInfo),
+      height: 30,
+      enabled: curFile != null,
+    ),
+    const PopupMenuDivider(),
+    PopupMenuItem<ContextItem>(
+      value: ContextItem.settings,
+      child: Text(localization.contextMenuSettings),
+      height: 30,
+    ),
+    PopupMenuItem<ContextItem>(
+      value: ContextItem.help,
+      child: Text(localization.contextMenuHelp),
+      height: 30,
+    ),
+    PopupMenuItem<ContextItem>(
+      value: ContextItem.aboult,
+      child: Text(localization.contextMenuAbout),
+      height: 30,
+    ),
+  ];
 
   return showMenu(
     context: context,
@@ -70,7 +67,7 @@ Future showContextMenu({
   ).then((selection) {
     switch (selection) {
       case ContextItem.openFile:
-        return showOpenFileDialog().then((file) => onSelectFile(file));
+        return showOpenFileDialog(context).then((file) => onSelectFile(file));
         break;
       case ContextItem.fileInfo:
         return showFileInfoDialog(context, curFile);

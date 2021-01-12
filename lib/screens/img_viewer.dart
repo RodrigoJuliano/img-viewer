@@ -26,7 +26,8 @@ class ImgViewer extends StatefulWidget {
 }
 
 /// This is the private State class that goes with MyStatefulWidget.
-/// AnimationControllers can be created with `vsync: this` because of TickerProviderStateMixin.
+/// AnimationControllers can be created with `vsync: this` because
+/// of TickerProviderStateMixin.
 class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   final TransformationController _transformationController =
       TransformationController();
@@ -102,7 +103,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
             callback: () {
               if (!dialogOpen) {
                 dialogOpen = true;
-                showOpenFileDialog().then((file) {
+                showOpenFileDialog(context).then((file) {
                   iniFile(file);
                   dialogOpen = false;
                 });

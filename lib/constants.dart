@@ -13,3 +13,5 @@ const suportedFormats = [
 const linkChangelog = 'https://github.com/RodrigoJuliano/img-viewer/releases';
 const linkIssues = 'https://github.com/RodrigoJuliano/img-viewer/issues';
 const linkSource = 'https://github.com/RodrigoJuliano/img-viewer';
+
+const version = 'v1.0.0';

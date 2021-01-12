@@ -1,13 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../components/custom_dialog.dart';
 import '../utils.dart';
 
 Future showFileInfoDialog(BuildContext context, File curFile) {
+  final localization = AppLocalizations.of(context);
+
   return showCustomDialog(
-    title: 'File Info',
+    title: localization.fileInfoDialogTitle,
     context: context,
     content: [
       Row(
@@ -15,11 +18,11 @@ Future showFileInfoDialog(BuildContext context, File curFile) {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              'Name:',
-              'Directory:',
-              'Type:',
-              'Size:',
-              'Modified:',
+              localization.fileInfoName,
+              localization.fileInfoDirectory,
+              localization.fileInfoType,
+              localization.fileInfoSize,
+              localization.fileInfoModified,
             ]
                 .map(
                   (e) => Padding(
@@ -61,7 +64,7 @@ Future showFileInfoDialog(BuildContext context, File curFile) {
     ],
     actions: [
       TextButton(
-        child: Text('Close'),
+        child: Text(localization.dialogCloseButton),
         onPressed: () {
           Navigator.pop(context);
         },

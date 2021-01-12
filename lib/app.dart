@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/settings_provider.dart';
@@ -45,6 +47,16 @@ class _AppState extends State<App> {
             theme: theme.lightThemeData,
             darkTheme: theme.darkThemeData,
             themeMode: context.watch<SettingsProvider>().settings?.themeMode,
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+            ],
+            supportedLocales: [
+              const Locale('en', ''), // English, no country code
+              const Locale('pt', ''), // Portuguese, no country code
+            ],
+            locale: Locale(context.watch<SettingsProvider>().settings.language),
             home: ImgViewer(
               filepath: widget.filepath,
             ),

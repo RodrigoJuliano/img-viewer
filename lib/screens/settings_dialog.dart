@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../components/custom_dialog.dart';
@@ -9,36 +10,40 @@ import '../providers/settings_provider.dart';
 
 Future showSettingsDialog(BuildContext context) {
   return showCustomDialog(
-    title: 'Settings',
+    title: AppLocalizations.of(context).settingsDialogTitle,
     context: context,
     content: [
-      Table(
-        defaultColumnWidth: IntrinsicColumnWidth(),
-        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-        children: [
-          TableRow(
-            children: <Widget>[
-              Text(
-                'Theme',
-                style: TextStyle(fontSize: 16),
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints(minHeight: 40),
-                child: Builder(
-                  // Builder to allow the use of context.watch
-                  builder: (BuildContext context) {
-                    return DropdownButton<ThemeMode>(
+      // Builder to allow the use of context.watch
+      // And update texts when changing language
+      Builder(
+        builder: (BuildContext context) {
+          final localization = AppLocalizations.of(context);
+          return Table(
+            defaultColumnWidth: IntrinsicColumnWidth(),
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            children: [
+              TableRow(
+                children: <Widget>[
+                  Text(
+                    localization.settingsTheme,
+                    style: TextStyle(fontSize: 16),
+                    softWrap: true,
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: 40),
+                    child: DropdownButton<ThemeMode>(
+                      isExpanded: true,
                       items: [
                         DropdownMenuItem(
-                          child: Text('Dark'),
+                          child: Text(localization.settingsThemeDark),
                           value: ThemeMode.dark,
                         ),
                         DropdownMenuItem(
-                          child: Text('Light'),
+                          child: Text(localization.settingsThemeLight),
                           value: ThemeMode.light,
                         ),
                         DropdownMenuItem(
-                          child: Text('System'),
+                          child: Text(localization.settingsThemeSystem),
                           value: ThemeMode
                               .system, // Currently does not work on Windows
                         ),
@@ -52,26 +57,56 @@ Future showSettingsDialog(BuildContext context) {
                         provider.settings =
                             provider.settings.copyWith(themeMode: value);
                       },
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          TableRow(
-            children: [
-              Text(
-                'Associate with suported files',
-                style: TextStyle(fontSize: 16),
-                // overflow: TextOverflow.ellipsis,
-                softWrap: true,
+              TableRow(
+                children: [
+                  Text(
+                    localization.settingsLanguage,
+                    style: TextStyle(fontSize: 16),
+                    // overflow: TextOverflow.ellipsis,
+                    softWrap: true,
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: 40),
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      items: [
+                        DropdownMenuItem(
+                          child: Text(localization.settingsLanguageEnglish),
+                          value: 'en',
+                        ),
+                        DropdownMenuItem(
+                          child: Text(localization.settingsLanguagePortuguese),
+                          value: 'pt',
+                        ),
+                      ],
+                      // Gets the value from the settings
+                      value:
+                          context.watch<SettingsProvider>().settings.language,
+                      onChanged: (value) {
+                        // Updates the value in the settings
+                        final provider = context.read<SettingsProvider>();
+                        provider.settings =
+                            provider.settings.copyWith(language: value);
+                      },
+                    ),
+                  ),
+                ],
               ),
-              ConstrainedBox(
-                constraints: BoxConstraints(minHeight: 40),
-                child: Builder(
-                  // Builder to allow the use of context.watch
-                  builder: (BuildContext context) {
-                    return Checkbox(
+              TableRow(
+                children: [
+                  Text(
+                    localization.settingsassociatedWithFileTypes,
+                    style: TextStyle(fontSize: 16),
+                    // overflow: TextOverflow.ellipsis,
+                    softWrap: true,
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: 40),
+                    child: Checkbox(
                       // Gets the value from the settings
                       value: context
                           .watch<SettingsProvider>()
@@ -86,7 +121,8 @@ Future showSettingsDialog(BuildContext context) {
                         // Run the (un)installation script
                         try {
                           // Run scripts only in release mode
-                          // To execute them in other modes, some adaptations are necessary
+                          // To execute them in other modes, some adaptations
+                          // are necessary
                           if (Platform.isWindows && kReleaseMode) {
                             Process.run(
                               value
@@ -105,18 +141,23 @@ Future showSettingsDialog(BuildContext context) {
                           print(e?.message);
                         }
                       },
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
             ],
-          ),
-        ],
-      )
+          );
+        },
+      ),
     ],
     actions: [
       TextButton(
-        child: Text('Close'),
+        // Builder to update the text when changing language
+        child: Builder(
+          builder: (BuildContext context) {
+            return Text(AppLocalizations.of(context).dialogCloseButton);
+          },
+        ),
         onPressed: () {
           Navigator.pop(context);
         },

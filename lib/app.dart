@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
+import 'providers/file_provider.dart';
 import 'providers/settings_provider.dart';
 import 'screens/img_viewer.dart';
 import 'theme/theme_data.dart' as theme;
@@ -29,8 +30,15 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => SettingsProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => SettingsProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => FileProvider(),
+        ),
+      ],
       child: Builder(
         builder: (context) {
           return MaterialApp(

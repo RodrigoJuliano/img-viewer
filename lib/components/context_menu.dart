@@ -35,7 +35,7 @@ Future showContextMenu({
       value: ContextItem.fileInfo,
       child: Text(localization.contextMenuFileInfo),
       height: 30,
-      enabled: curFile != null,
+      enabled: curFile != null && curFile.existsSync(),
     ),
     const PopupMenuDivider(),
     PopupMenuItem<ContextItem>(
@@ -70,7 +70,7 @@ Future showContextMenu({
         return showOpenFileDialog(context).then((file) => onSelectFile(file));
         break;
       case ContextItem.fileInfo:
-        return showFileInfoDialog(context, curFile);
+        return showFileInfoDialog(context);
         break;
       case ContextItem.settings:
         return showSettingsDialog(context);

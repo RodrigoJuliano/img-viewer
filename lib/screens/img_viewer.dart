@@ -1,16 +1,16 @@
-import 'dart:io';
-
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../app.dart';
 import '../components/context_menu.dart';
 import '../components/control_dock.dart';
 import '../components/resetable_interactive_viewer.dart';
 import '../constants.dart';
+import '../providers/file_provider.dart';
 import '../utils.dart';
 import 'file_info_dialog.dart';
 import 'open_file_dialog.dart';
@@ -33,14 +33,10 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
       TransformationController();
 
   AnimationController _rotationController;
-  bool fileFound = false;
-  List<FileSystemEntity> imgsCurDir;
-  int curIndex;
-  File curFile;
 
-  bool _dialogOpen = false;
-  bool get dialogOpen => _dialogOpen;
-  set dialogOpen(bool value) => setState(() => _dialogOpen = value);
+  bool _isDialogOpen = false;
+  bool get isDialogOpen => _isDialogOpen;
+  set isDialogOpen(bool value) => setState(() => _isDialogOpen = value);
 
   void _animateRotLeft() {
     if (!_rotationController.isAnimating) {
@@ -77,18 +73,16 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
       vsync: this,
     );
 
-    iniFile(widget.filepath);
-
     // To execute after fist frame (The App parent is builded after this widget)
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => {
+      (_) {
         // Setup the shortcuts
         App.of(context).shortcuts = {
           LogicalKeySet(LogicalKeyboardKey.arrowLeft): CallbackIntent(
-            callback: () => goToImg(-1),
+            callback: goPreviousImg,
           ),
           LogicalKeySet(LogicalKeyboardKey.arrowRight): CallbackIntent(
-            callback: () => goToImg(1),
+            callback: goNextImg,
           ),
           LogicalKeySet(LogicalKeyboardKey.arrowUp): CallbackIntent(
             callback: _animateRotLeft,
@@ -101,11 +95,11 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
             LogicalKeyboardKey.keyO,
           ): CallbackIntent(
             callback: () {
-              if (!dialogOpen) {
-                dialogOpen = true;
+              if (!isDialogOpen) {
+                isDialogOpen = true;
                 showOpenFileDialog(context).then((file) {
                   iniFile(file);
-                  dialogOpen = false;
+                  isDialogOpen = false;
                 });
               }
             },
@@ -115,52 +109,36 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
             LogicalKeyboardKey.keyI,
           ): CallbackIntent(
             callback: () {
-              if (!dialogOpen) {
+              var curFile = context.read<FileProvider>().curFile;
+              if (!isDialogOpen) {
                 if (curFile != null) {
-                  dialogOpen = true;
-                  showFileInfoDialog(context, curFile)
-                      .then((value) => dialogOpen = false);
+                  isDialogOpen = true;
+                  showFileInfoDialog(context)
+                      .then((value) => isDialogOpen = false);
                 }
               }
             },
           ),
           LogicalKeySet(LogicalKeyboardKey.escape): CallbackIntent(
             callback: () {
-              if (dialogOpen) {
+              if (isDialogOpen) {
                 Navigator.of(context, rootNavigator: true).pop();
               }
             },
           ),
-        }
+        };
+
+        iniFile(widget.filepath);
       },
     );
   }
 
   void iniFile(String filePath) {
     if (filePath != null) {
-      setState(() {
-        curFile = File(filePath);
-        fileFound = curFile.existsSync();
-        if (fileFound) {
-          imgsCurDir = curFile.parent.listSync().where((f) {
-            if (f is File) {
-              // Last 5 chars in lowercase
-              var _end = f.path
-                  .substring(f.path.length - 5, f.path.length)
-                  .toLowerCase();
-              // Check if it ends with one of the supported extensions
-              return suportedFormats.any((e) => _end.endsWith('.$e'));
-            } else {
-              return false;
-            }
-          }).toList(growable: false);
-
-          curIndex = imgsCurDir.indexWhere((el) => el.path == filePath);
-          updateTitle();
-        }
-      });
-      resetAllTransf();
+      context.read<FileProvider>().setInitialFile(filePath, suportedFormats);
+      updateTitle();
     }
+    resetAllTransf();
   }
 
   void resetAllTransf() {
@@ -172,32 +150,21 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   }
 
   void updateTitle() {
-    appWindow.title = "ImgViewer - ${getFileNameFrom(curFile.path)}";
+    var curFile = context.read<FileProvider>().curFile;
+
+    appWindow.title = 'ImgViewer - ${curFile.path}';
   }
 
-  // 1 for the next img, -1 for previous one
-  void goToImg(int dir) {
-    if (imgsCurDir != null && imgsCurDir.isNotEmpty) {
+  void goNextImg() {
+    if (context.read<FileProvider>().goNextFile()) {
       resetAllTransf();
-      if (dir > 0) {
-        setState(() {
-          if (curIndex < imgsCurDir.length - 1) {
-            curIndex++;
-          } else {
-            curIndex = 0;
-          }
-          curFile = imgsCurDir[curIndex];
-        });
-      } else {
-        setState(() {
-          if (curIndex > 0) {
-            curIndex--;
-          } else {
-            curIndex = imgsCurDir.length - 1;
-          }
-          curFile = imgsCurDir[curIndex];
-        });
-      }
+      updateTitle();
+    }
+  }
+
+  void goPreviousImg() {
+    if (context.read<FileProvider>().goPreviousFile()) {
+      resetAllTransf();
       updateTitle();
     }
   }
@@ -210,18 +177,19 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    var curFile = context.watch<FileProvider>().curFile;
     return Scaffold(
       body: ResetableInteractiveViewer(
         transformationController: _transformationController,
         onRightClick: (Offset pos) {
-          if (!dialogOpen) {
-            dialogOpen = true;
+          if (!isDialogOpen) {
+            isDialogOpen = true;
             showContextMenu(
               context: context,
               pos: pos,
               curFile: curFile,
               onSelectFile: iniFile,
-            ).then((value) => dialogOpen = false);
+            ).then((value) => isDialogOpen = false);
           }
         },
         onDoubleClick: _animateResetRot,
@@ -250,8 +218,8 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
           ? ControlDock(
               onPressRotLeft: _animateRotLeft,
               onPressRotRight: _animateRotRight,
-              onPressPrev: () => goToImg(-1),
-              onPressNext: () => goToImg(1),
+              onPressPrev: goPreviousImg,
+              onPressNext: goNextImg,
             )
           : null,
     );

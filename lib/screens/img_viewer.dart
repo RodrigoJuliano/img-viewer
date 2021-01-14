@@ -124,6 +124,24 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
               }
             },
           ),
+          // TODO: LogicalKeyboardKey.contextMenu are not working
+          // it is necessary to test with other keyboards
+          LogicalKeySet(LogicalKeyboardKey(0x1070000005d)): CallbackIntent(
+            callback: () {
+              if (!isDialogOpen) {
+                isDialogOpen = true;
+                showContextMenu(
+                  context: context,
+                  pos: Offset(0, 0),
+                  curFile: context.read<FileProvider>().curFile,
+                  onSelectFile: iniFile,
+                ).then((value) => isDialogOpen = false);
+              } else {
+                isDialogOpen = false;
+                Navigator.of(context, rootNavigator: true).pop();
+              }
+            },
+          ),
         };
 
         iniFile(widget.filepath);

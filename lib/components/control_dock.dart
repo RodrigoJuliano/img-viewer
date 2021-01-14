@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'control_button.dart';
 
@@ -51,6 +52,7 @@ class _ControlDockState extends State<ControlDock>
 
   @override
   Widget build(BuildContext context) {
+    var localization = AppLocalizations.of(context);
     return MouseRegion(
       onEnter: (PointerEvent pe) => {
         _controller.forward(),
@@ -76,18 +78,22 @@ class _ControlDockState extends State<ControlDock>
                   ControlButton(
                     iconData: Icons.arrow_back,
                     onPress: widget.onPressPrev,
+                    tooltip: localization.controlDockPreviusImage,
                   ),
                   ControlButton(
                     iconData: Icons.rotate_left,
                     onPress: widget.onPressRotLeft,
+                    tooltip: localization.controlDockRotateImageLeft,
                   ),
                   ControlButton(
                     iconData: Icons.rotate_right,
                     onPress: widget.onPressRotRight,
+                    tooltip: localization.controlDockRotateImageRight,
                   ),
                   ControlButton(
                     iconData: Icons.arrow_forward,
                     onPress: widget.onPressNext,
+                    tooltip: localization.controlDockNextImage,
                   ),
                 ],
               ),

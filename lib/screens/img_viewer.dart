@@ -11,6 +11,7 @@ import '../components/control_dock.dart';
 import '../components/resetable_interactive_viewer.dart';
 import '../constants.dart';
 import '../providers/file_provider.dart';
+import '../providers/settings_provider.dart';
 import '../utils.dart';
 import 'file_info_dialog.dart';
 import 'open_file_dialog.dart';
@@ -171,6 +172,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     var curFile = context.watch<FileProvider>().curFile;
+    var settings = context.watch<SettingsProvider>().settings;
     return Scaffold(
       body: ResetableInteractiveViewer(
         // Forces the widget to be rebuilt when the file is changed
@@ -195,7 +197,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
               ? Image.file(
                   curFile,
                   scale: 1.0,
-                  filterQuality: FilterQuality.none,
+                  filterQuality: settings.filterQuality,
                   errorBuilder: (
                     BuildContext context,
                     Object exception,

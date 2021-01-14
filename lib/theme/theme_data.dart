@@ -12,6 +12,13 @@ ThemeData themeData(ColorScheme colorScheme) {
     dialogTheme: DialogTheme(
       backgroundColor: colorScheme.surface,
     ),
+    tooltipTheme: TooltipThemeData(
+      waitDuration: Duration(milliseconds: 600),
+      textStyle: TextStyle(
+        fontSize: 12,
+        color: colorScheme.surface,
+      ),
+    ),
     dividerTheme: DividerThemeData(
       color: colorScheme.onSurface.withAlpha(96),
       endIndent: 8,

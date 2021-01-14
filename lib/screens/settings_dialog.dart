@@ -6,6 +6,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../components/custom_dialog.dart';
+import '../components/deactivable_tootip.dart';
 import '../providers/settings_provider.dart';
 
 Future showSettingsDialog(BuildContext context) {
@@ -27,6 +28,7 @@ Future showSettingsDialog(BuildContext context) {
             children: [
               _Tile(
                 label: localization.settingsTheme,
+                tooltip: localization.settingsThemeTooltip,
                 option: DropdownButtonHideUnderline(
                   child: DropdownButton<ThemeMode>(
                     isExpanded: true,
@@ -57,7 +59,54 @@ Future showSettingsDialog(BuildContext context) {
               ),
               Divider(indent: 0, endIndent: 0),
               _Tile(
+                label: localization.settingsFilterQuality,
+                tooltip: localization.settingsFilterQualityTooltip,
+                option: DropdownButtonHideUnderline(
+                  child: DropdownButton<FilterQuality>(
+                    items: [
+                      DropdownMenuItem(
+                        child: Text(
+                          localization.settingsFilterQualityHigh,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        value: FilterQuality.high,
+                      ),
+                      DropdownMenuItem(
+                        child: Text(
+                          localization.settingsFilterQualityMedium,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        value: FilterQuality.medium,
+                      ),
+                      DropdownMenuItem(
+                        child: Text(
+                          localization.settingsFilterQualityLow,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        value: FilterQuality.low,
+                      ),
+                      DropdownMenuItem(
+                        child: Text(
+                          localization.settingsFilterQualityNone,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        value: FilterQuality.none,
+                      ),
+                    ],
+                    // Gets the value from the settings
+                    value: settingsProvider.settings.filterQuality,
+                    onChanged: (value) {
+                      // Updates the value in the settings
+                      settingsProvider.settings = settingsProvider.settings
+                          .copyWith(filterQuality: value);
+                    },
+                  ),
+                ),
+              ),
+              Divider(indent: 0, endIndent: 0),
+              _Tile(
                 label: localization.settingsLanguage,
+                tooltip: localization.settingsLanguageTooltip,
                 option: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     items: [
@@ -88,7 +137,8 @@ Future showSettingsDialog(BuildContext context) {
               ),
               Divider(indent: 0, endIndent: 0),
               _Tile(
-                label: localization.settingsassociatedWithFileTypes,
+                label: localization.settingsAssociatedWithFileTypes,
+                tooltip: localization.settingsAssociatedWithFileTypesTooltip,
                 option: Checkbox(
                   // Gets the value from the settings
                   value: settingsProvider.settings.associatedWithFileTypes,
@@ -122,6 +172,20 @@ Future showSettingsDialog(BuildContext context) {
                   },
                 ),
               ),
+              Divider(indent: 0, endIndent: 0),
+              _Tile(
+                label: localization.settingsShowTooltips,
+                tooltip: localization.settingsShowTooltipsTooltip,
+                option: Checkbox(
+                  // Gets the value from the settings
+                  value: settingsProvider.settings.showTooltips,
+                  onChanged: (value) {
+                    // Updates the value in the settings
+                    settingsProvider.settings =
+                        settingsProvider.settings.copyWith(showTooltips: value);
+                  },
+                ),
+              ),
             ],
           );
         },
@@ -144,29 +208,38 @@ Future showSettingsDialog(BuildContext context) {
 }
 
 class _Tile extends StatelessWidget {
-  _Tile({Key key, this.label, this.option}) : super(key: key);
+  _Tile({
+    Key key,
+    @required this.label,
+    @required this.option,
+    this.tooltip,
+  }) : super(key: key);
 
   final String label;
   final Widget option;
+  final String tooltip;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 35,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: TextStyle(fontSize: 16),
+    return DeativableTooltip(
+      tooltip: tooltip,
+      child: SizedBox(
+        height: 35,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(fontSize: 16),
+              ),
             ),
-          ),
-          SizedBox(
-            width: 110,
-            child: option,
-          ),
-        ],
+            SizedBox(
+              width: 110,
+              child: option,
+            ),
+          ],
+        ),
       ),
     );
   }

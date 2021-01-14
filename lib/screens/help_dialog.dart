@@ -6,7 +6,7 @@ import '../components/custom_dialog.dart';
 Future showHelpDialog(BuildContext context) {
   final localization = AppLocalizations.of(context);
   return showCustomDialog(
-    title: Text(localization.aboutDialogTitle),
+    title: Text(localization.helpDialogTitle),
     context: context,
     content: [],
     actions: [

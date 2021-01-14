@@ -29,16 +29,13 @@ class ImgViewer extends StatefulWidget {
 /// AnimationControllers can be created with `vsync: this` because
 /// of TickerProviderStateMixin.
 class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
-  final TransformationController _transformationController =
-      TransformationController();
-
   AnimationController _rotationController;
 
   bool _isDialogOpen = false;
   bool get isDialogOpen => _isDialogOpen;
   set isDialogOpen(bool value) => setState(() => _isDialogOpen = value);
 
-  void _animateRotLeft() {
+  void _animateRotateLeft() {
     if (!_rotationController.isAnimating) {
       if (_rotationController.value == 0) {
         _rotationController.value = 1;
@@ -47,7 +44,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
     }
   }
 
-  void _animateRotRight() {
+  void _animateRotateRight() {
     if (!_rotationController.isAnimating) {
       if (_rotationController.value == 1) {
         _rotationController.value = 0;
@@ -56,7 +53,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
     }
   }
 
-  void _animateResetRot() {
+  void _animateResetRotation() {
     if (_rotationController.value < 0.5) {
       _rotationController.animateTo(0.0, duration: Duration(milliseconds: 200));
     } else {
@@ -85,10 +82,10 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
             callback: goNextImg,
           ),
           LogicalKeySet(LogicalKeyboardKey.arrowUp): CallbackIntent(
-            callback: _animateRotLeft,
+            callback: _animateRotateLeft,
           ),
           LogicalKeySet(LogicalKeyboardKey.arrowDown): CallbackIntent(
-            callback: _animateRotRight,
+            callback: _animateRotateRight,
           ),
           LogicalKeySet(
             LogicalKeyboardKey.controlLeft,
@@ -138,14 +135,10 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
       context.read<FileProvider>().setInitialFile(filePath, suportedFormats);
       updateTitle();
     }
-    resetAllTransf();
+    resetRotation();
   }
 
-  void resetAllTransf() {
-    // Zoom
-    _transformationController.value = Matrix4.identity();
-
-    // Rotation
+  void resetRotation() {
     _rotationController.reset();
   }
 
@@ -157,14 +150,14 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
 
   void goNextImg() {
     if (context.read<FileProvider>().goNextFile()) {
-      resetAllTransf();
+      resetRotation();
       updateTitle();
     }
   }
 
   void goPreviousImg() {
     if (context.read<FileProvider>().goPreviousFile()) {
-      resetAllTransf();
+      resetRotation();
       updateTitle();
     }
   }
@@ -180,7 +173,10 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
     var curFile = context.watch<FileProvider>().curFile;
     return Scaffold(
       body: ResetableInteractiveViewer(
-        transformationController: _transformationController,
+        // Forces the widget to be rebuilt when the file is changed
+        // to reset animations (The InteractiveViewer offers no
+        // way to stop animations)
+        key: ValueKey(curFile),
         onRightClick: (Offset pos) {
           if (!isDialogOpen) {
             isDialogOpen = true;
@@ -192,7 +188,7 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
             ).then((value) => isDialogOpen = false);
           }
         },
-        onDoubleClick: _animateResetRot,
+        onDoubleClick: _animateResetRotation,
         child: RotationTransition(
           turns: _rotationController,
           child: curFile != null
@@ -216,8 +212,8 @@ class _ImgViewerState extends State<ImgViewer> with TickerProviderStateMixin {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: curFile != null
           ? ControlDock(
-              onPressRotLeft: _animateRotLeft,
-              onPressRotRight: _animateRotRight,
+              onPressRotLeft: _animateRotateLeft,
+              onPressRotRight: _animateRotateRight,
               onPressPrev: goPreviousImg,
               onPressNext: goNextImg,
             )

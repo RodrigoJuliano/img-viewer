@@ -5,12 +5,10 @@ class ResetableInteractiveViewer extends StatefulWidget {
   ResetableInteractiveViewer({
     Key key,
     this.child,
-    @required this.transformationController,
     this.onRightClick,
     this.onDoubleClick,
   }) : super(key: key);
   final Widget child;
-  final TransformationController transformationController;
   final void Function(Offset pos) onRightClick;
   final VoidCallback onDoubleClick;
 
@@ -24,8 +22,11 @@ class _ResetableInteractiveViewerState extends State<ResetableInteractiveViewer>
   Animation<Matrix4> _animationReset;
   AnimationController _controllerReset;
 
+  final TransformationController _transformationController =
+      TransformationController();
+
   void _onAnimateReset() {
-    widget.transformationController.value = _animationReset.value;
+    _transformationController.value = _animationReset.value;
     if (!_controllerReset.isAnimating) {
       _animationReset?.removeListener(_onAnimateReset);
     }
@@ -34,7 +35,7 @@ class _ResetableInteractiveViewerState extends State<ResetableInteractiveViewer>
   void _animateResetInitialize() {
     _controllerReset.reset();
     _animationReset = Matrix4Tween(
-      begin: widget.transformationController.value,
+      begin: _transformationController.value,
       end: Matrix4.identity(),
     ).animate(_controllerReset);
     _animationReset.addListener(_onAnimateReset);
@@ -69,7 +70,7 @@ class _ResetableInteractiveViewerState extends State<ResetableInteractiveViewer>
           : null,
       child: InteractiveViewer(
         boundaryMargin: EdgeInsets.all(double.infinity),
-        transformationController: widget.transformationController,
+        transformationController: _transformationController,
         maxScale: 100.0,
         minScale: 0.5,
         child: Center(child: widget.child),

@@ -14,7 +14,7 @@ Future showAboutDialog(BuildContext context) {
   const legalese = '© 2021 RodrigoJuliano';
 
   return showCustomDialog(
-    title: localization.aboutDialogTitle,
+    title: Text(localization.aboutDialogTitle),
     context: context,
     content: [
       Text('${localization.aboutVersion} $version'),

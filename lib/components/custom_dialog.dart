@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 Future showCustomDialog({
-  @required String title,
+  @required Widget title,
   @required BuildContext context,
   List<Widget> content = const [],
   List<Widget> actions = const [],
@@ -9,21 +9,13 @@ Future showCustomDialog({
   return showDialog(
     context: context,
     builder: (BuildContext context) => SimpleDialog(
-      title: Column(
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 18,
-            ),
-          ),
-          Divider(
-            indent: 0,
-            endIndent: 0,
-          ),
-        ],
+      title: DefaultTextStyle(
+        child: title,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.headline6,
       ),
-      contentPadding: EdgeInsets.fromLTRB(16.0, 5.0, 16.0, 10.0),
+      titlePadding: EdgeInsets.all(20),
+      contentPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 10.0),
       children: [
         ...content,
         Wrap(

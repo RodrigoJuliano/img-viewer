@@ -10,7 +10,7 @@ Future showFileInfoDialog(BuildContext context) {
   final localization = AppLocalizations.of(context);
 
   return showCustomDialog(
-    title: localization.fileInfoDialogTitle,
+    title: Text(localization.fileInfoDialogTitle),
     context: context,
     content: [
       Row(
@@ -27,12 +27,15 @@ Future showFileInfoDialog(BuildContext context) {
                 .map(
                   (e) => Padding(
                     padding: EdgeInsets.only(bottom: 5),
-                    child: Text(e),
+                    child: Text(
+                      e,
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
                   ),
                 )
                 .toList(),
           ),
-          Divider(indent: 10),
+          SizedBox(width: 10),
           Flexible(
             child: Builder(
               builder: (BuildContext context) {

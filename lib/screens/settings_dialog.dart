@@ -10,7 +10,11 @@ import '../providers/settings_provider.dart';
 
 Future showSettingsDialog(BuildContext context) {
   return showCustomDialog(
-    title: AppLocalizations.of(context).settingsDialogTitle,
+    title: Builder(
+      builder: (BuildContext context) {
+        return Text(AppLocalizations.of(context).settingsDialogTitle);
+      },
+    ),
     context: context,
     content: [
       // Builder to allow the use of context.watch
@@ -18,132 +22,105 @@ Future showSettingsDialog(BuildContext context) {
       Builder(
         builder: (BuildContext context) {
           final localization = AppLocalizations.of(context);
-          return Table(
-            defaultColumnWidth: IntrinsicColumnWidth(),
-            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+          final settingsProvider = Provider.of<SettingsProvider>(context);
+          return Column(
             children: [
-              TableRow(
-                children: <Widget>[
-                  Text(
-                    localization.settingsTheme,
-                    style: TextStyle(fontSize: 16),
-                    softWrap: true,
+              _Tile(
+                label: localization.settingsTheme,
+                option: DropdownButtonHideUnderline(
+                  child: DropdownButton<ThemeMode>(
+                    isExpanded: true,
+                    items: [
+                      DropdownMenuItem(
+                        child: Text(localization.settingsThemeDark),
+                        value: ThemeMode.dark,
+                      ),
+                      DropdownMenuItem(
+                        child: Text(localization.settingsThemeLight),
+                        value: ThemeMode.light,
+                      ),
+                      DropdownMenuItem(
+                        child: Text(localization.settingsThemeSystem),
+                        value: ThemeMode
+                            .system, // Currently does not work on Windows
+                      ),
+                    ],
+                    // Gets the value from the settings
+                    value: settingsProvider.settings.themeMode,
+                    onChanged: (value) {
+                      // Updates the value in the settings
+                      settingsProvider.settings =
+                          settingsProvider.settings.copyWith(themeMode: value);
+                    },
                   ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: 40),
-                    child: DropdownButton<ThemeMode>(
-                      isExpanded: true,
-                      items: [
-                        DropdownMenuItem(
-                          child: Text(localization.settingsThemeDark),
-                          value: ThemeMode.dark,
-                        ),
-                        DropdownMenuItem(
-                          child: Text(localization.settingsThemeLight),
-                          value: ThemeMode.light,
-                        ),
-                        DropdownMenuItem(
-                          child: Text(localization.settingsThemeSystem),
-                          value: ThemeMode
-                              .system, // Currently does not work on Windows
-                        ),
-                      ],
-                      // Gets the value from the settings
-                      value:
-                          context.watch<SettingsProvider>().settings.themeMode,
-                      onChanged: (value) {
-                        // Updates the value in the settings
-                        final provider = context.read<SettingsProvider>();
-                        provider.settings =
-                            provider.settings.copyWith(themeMode: value);
-                      },
-                    ),
-                  ),
-                ],
+                ),
               ),
-              TableRow(
-                children: [
-                  Text(
-                    localization.settingsLanguage,
-                    style: TextStyle(fontSize: 16),
-                    // overflow: TextOverflow.ellipsis,
-                    softWrap: true,
-                  ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: 40),
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      items: [
-                        DropdownMenuItem(
-                          child: Text(localization.settingsLanguageEnglish),
-                          value: 'en',
+              Divider(indent: 0, endIndent: 0),
+              _Tile(
+                label: localization.settingsLanguage,
+                option: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    items: [
+                      DropdownMenuItem(
+                        child: Text(
+                          localization.settingsLanguageEnglish,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        DropdownMenuItem(
-                          child: Text(localization.settingsLanguagePortuguese),
-                          value: 'pt',
+                        value: 'en',
+                      ),
+                      DropdownMenuItem(
+                        child: Text(
+                          localization.settingsLanguagePortuguese,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
-                      // Gets the value from the settings
-                      value:
-                          context.watch<SettingsProvider>().settings.language,
-                      onChanged: (value) {
-                        // Updates the value in the settings
-                        final provider = context.read<SettingsProvider>();
-                        provider.settings =
-                            provider.settings.copyWith(language: value);
-                      },
-                    ),
+                        value: 'pt',
+                      ),
+                    ],
+                    // Gets the value from the settings
+                    value: settingsProvider.settings.language,
+                    onChanged: (value) {
+                      // Updates the value in the settings
+                      settingsProvider.settings =
+                          settingsProvider.settings.copyWith(language: value);
+                    },
                   ),
-                ],
+                ),
               ),
-              TableRow(
-                children: [
-                  Text(
-                    localization.settingsassociatedWithFileTypes,
-                    style: TextStyle(fontSize: 16),
-                    // overflow: TextOverflow.ellipsis,
-                    softWrap: true,
-                  ),
-                  ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: 40),
-                    child: Checkbox(
-                      // Gets the value from the settings
-                      value: context
-                          .watch<SettingsProvider>()
-                          .settings
-                          .associatedWithFileTypes,
-                      onChanged: (value) {
-                        // Updates the value in the settings
-                        final provider = context.read<SettingsProvider>();
-                        provider.settings = provider.settings
-                            .copyWith(associatedWithFileTypes: value);
+              Divider(indent: 0, endIndent: 0),
+              _Tile(
+                label: localization.settingsassociatedWithFileTypes,
+                option: Checkbox(
+                  // Gets the value from the settings
+                  value: settingsProvider.settings.associatedWithFileTypes,
+                  onChanged: (value) {
+                    // Updates the value in the settings
+                    settingsProvider.settings = settingsProvider.settings
+                        .copyWith(associatedWithFileTypes: value);
 
-                        // Run the (un)installation script
-                        try {
-                          // Run scripts only in release mode
-                          // To execute them in other modes, some adaptations
-                          // are necessary
-                          if (Platform.isWindows && kReleaseMode) {
-                            Process.run(
-                              value
-                                  ? 'scripts\\install.bat'
-                                  : 'scripts\\uninstall.bat',
-                              [],
-                            ).then(
-                              (ProcessResult result) {
-                                print(result.exitCode);
-                                print(result.stdout);
-                                print(result.stderr);
-                              },
-                            );
-                          }
-                        } on ProcessException catch (e) {
-                          print(e?.message);
-                        }
-                      },
-                    ),
-                  ),
-                ],
+                    // Run the (un)installation script
+                    try {
+                      // Run scripts only in release mode
+                      // To execute them in other modes, some adaptations
+                      // are necessary
+                      if (Platform.isWindows && kReleaseMode) {
+                        Process.run(
+                          value
+                              ? 'scripts\\install.bat'
+                              : 'scripts\\uninstall.bat',
+                          [],
+                        ).then(
+                          (ProcessResult result) {
+                            print(result.exitCode);
+                            print(result.stdout);
+                            print(result.stderr);
+                          },
+                        );
+                      }
+                    } on ProcessException catch (e) {
+                      print(e?.message);
+                    }
+                  },
+                ),
               ),
             ],
           );
@@ -164,4 +141,33 @@ Future showSettingsDialog(BuildContext context) {
       ),
     ],
   );
+}
+
+class _Tile extends StatelessWidget {
+  _Tile({Key key, this.label, this.option}) : super(key: key);
+
+  final String label;
+  final Widget option;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 35,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+          SizedBox(
+            width: 110,
+            child: option,
+          ),
+        ],
+      ),
+    );
+  }
 }

@@ -20,42 +20,64 @@ class Hyperlink extends StatefulWidget {
 }
 
 class _HyperlinkState extends State<Hyperlink> {
-  bool _hovering = false;
+  bool _isHovered;
+  bool _isFocused;
 
   @override
   void initState() {
     super.initState();
 
-    _hovering = false;
+    _isHovered = false;
+    _isFocused = false;
+  }
+
+  void onActivate() async {
+    if (await canLaunch(widget.link)) {
+      await launch(
+        widget.link,
+        forceSafariVC: false,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (ev) => setState(() {
-        _hovering = true;
-      }),
-      onExit: (ev) => setState(() {
-        _hovering = false;
-      }),
-      child: RichText(
-        text: TextSpan(
-          style: TextStyle(
-            color: widget.color,
-            decoration:
-                _hovering ? TextDecoration.underline : TextDecoration.none,
+    return FocusableActionDetector(
+      mouseCursor: SystemMouseCursors.click,
+      actions: {
+        ...WidgetsApp.defaultActions,
+        ActivateIntent: CallbackAction<ActivateIntent>(
+          onInvoke: (ActivateIntent intent) {
+            onActivate();
+            return null;
+          },
+        ),
+      },
+      onShowHoverHighlight: (hovered) {
+        setState(() {
+          _isHovered = hovered;
+        });
+      },
+      onShowFocusHighlight: (focused) {
+        setState(() {
+          _isFocused = focused;
+        });
+      },
+      child: Container(
+        color: _isFocused
+            ? Theme.of(context).accentColor.withAlpha(50)
+            : Colors.transparent,
+        child: RichText(
+          text: TextSpan(
+            style: TextStyle(
+              color: widget.color,
+              decoration: _isHovered || _isFocused
+                  ? TextDecoration.underline
+                  : TextDecoration.none,
+            ),
+            text: widget.text != null ? widget.text : widget.link,
+            recognizer: TapGestureRecognizer()..onTap = onActivate,
           ),
-          text: widget.text != null ? widget.text : widget.link,
-          recognizer: TapGestureRecognizer()
-            ..onTap = () async {
-              if (await canLaunch(widget.link)) {
-                await launch(
-                  widget.link,
-                  forceSafariVC: false,
-                );
-              }
-            },
         ),
       ),
     );

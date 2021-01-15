@@ -224,7 +224,7 @@ class _Tile extends StatelessWidget {
     return DeativableTooltip(
       tooltip: tooltip,
       child: SizedBox(
-        height: 35,
+        height: 30,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

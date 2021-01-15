@@ -44,13 +44,13 @@ class _AppState extends State<App> {
           return MaterialApp(
             title: 'ImgViewer',
             actions: <Type, Action<Intent>>{
+              ...WidgetsApp.defaultActions,
               CallbackIntent: CallbackAction<CallbackIntent>(
                 onInvoke: (CallbackIntent intent) {
                   return intent.callback();
                 },
               ),
             },
-            shortcuts: _shortcuts,
             debugShowCheckedModeBanner: false,
             theme: theme.lightThemeData,
             darkTheme: theme.darkThemeData,
